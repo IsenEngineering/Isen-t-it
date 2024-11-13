@@ -44,7 +44,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>,
             texture,
             transform: Transform {
                 // On la dépose vers le centre
-                translation: Vec3::new(100., 0., 0.),
+                translation: Vec3::new(0., 0., 0.),
                 // On double sa taille
                 scale: Vec3::new(2., 2., 1.),
                 ..default()
@@ -104,6 +104,17 @@ fn move_sprite(keyboard: Res<ButtonInput<KeyCode>>,
 #[derive(Component)]
 struct AnimationTimer(Timer);
 
+// Trouve l'indice de l'image suivante de l'animation
+fn update_animation(indice: usize, min: usize, max: usize) -> usize {
+    if indice < min || indice > max {
+        // Première image de l'animation
+        return min
+    } else {
+        // On passe sur chaque image de l'animation de course.
+        return min + (indice + 1 - min) % (max - min);
+    }
+}
+
 fn animate_sprite(
     time: Res<Time>,
     mut query: Query<(
@@ -121,34 +132,18 @@ fn animate_sprite(
         let is_moving = velocity.dx != 0.0 || velocity.dy != 0.0;
         let is_sprinting = velocity.dx.abs() >= PLAYER_SPRINT_SPEED || 
             velocity.dy.abs() >= PLAYER_SPRINT_SPEED;
+        
+        // si l'entité est mouvement.
         if velocity.dx != 0.0 {
-            // On ajuste le côté où regarde 
-            // l'entité si elle est mouvement.
+            // On ajuste le côté où elle regarde.
             sprite.flip_x = velocity.dx < 0.0;
         }
 
         // Dans le cas où l'entité bouge, on l'anime.
-        if is_moving && !is_sprinting && timer.0.finished() {
-            // Première image = 4
-            // Dernière image = 9
-            if texture.index < 4 || texture.index > 9 {
-                // Première image de l'animation
-                texture.index = 4
-            } else {
-                // On passe sur chaque image de l'animation de course.
-
-                texture.index = 4 + (texture.index - 3) % 6;
-            }
-        } else if is_moving && is_sprinting && timer.0.finished() {
-            // Première image = 17
-            // Dernière image = 23
-            if texture.index < 17 || texture.index > 23 {
-                // Première image de l'animation
-                texture.index = 17
-            } else {
-                // On passe sur chaque image de l'animation de course.
-
-                texture.index = 17 + (texture.index - 16) % 7;
+        if is_moving && timer.0.finished() {
+            texture.index = match is_sprinting {
+                true => update_animation(texture.index, 17, 23),
+                false => update_animation(texture.index, 4, 9)
             }
         } else if !is_moving {
             // L'image par défaut.

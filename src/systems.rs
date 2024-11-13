@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, window::WindowResized};
 use crate::composants::Velocity;
 
 // Mets en mouvements toutes les entités 
@@ -12,4 +12,35 @@ pub fn movement_system(
 		translation.x += velocity.dx * time.delta_seconds();
 		translation.y += velocity.dy * time.delta_seconds();
 	}
+}
+
+const CAMERA_SMOOTHING:f32 = 0.05; 
+// Should be greater than zero.
+
+pub fn camera_follow_system(
+    player_query: Query<&Transform, With<Velocity>>,
+    mut camera_query: Query<&mut Transform, (With<Camera>, Without<Velocity>)>,
+) {
+    let player = match player_query.get_single() {
+        Ok(transform) => transform,
+        Err(_) => return,
+    };
+
+    let mut cam = match camera_query.get_single_mut() {
+        Ok(transform) => transform,
+        Err(_) => return,
+    };
+    let delta: Vec3 = player.translation - cam.translation;
+	cam.translation.x += delta.x*CAMERA_SMOOTHING;
+}
+
+pub fn on_resize_system(
+    mut q: Query<&mut OrthographicProjection, With<Camera>>,
+    mut resize_reader: EventReader<WindowResized>,
+) {
+    for e in resize_reader.read() {
+        for mut projection in q.iter_mut() {
+            projection.scale = 2.0 * 48.0 / e.height;
+        }
+    }
 }

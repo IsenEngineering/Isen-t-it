@@ -5,6 +5,7 @@ use bevy::{
 
 mod composants;
 mod joueur;
+mod scene;
 mod systems;
 
 fn main() {
@@ -20,18 +21,25 @@ fn main() {
     ));
 
     // Au démarrage
-    app.add_systems(Startup, setup);
+    app.add_systems(Startup, (
+        setup, 
+        scene::setup
+    ));
 
     // à chaque image
-    app.add_systems(Update, systems::movement_system);
+    app.add_systems(Update, (
+        systems::movement_system, 
+        systems::on_resize_system,
+        systems::camera_follow_system
+    ));
     app.run();
 }
 
 fn setup(mut commands: Commands) {
-    let mut camera = Camera2dBundle::default();
+    let mut camera: Camera2dBundle = Camera2dBundle::default();
 
     camera.camera.clear_color = ClearColorConfig::Custom(WHITE.into());
-    camera.projection.scale = 0.5;
+    camera.projection.scale = 0.2;
     
     commands.spawn(camera);
 }
