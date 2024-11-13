@@ -13,7 +13,9 @@ fn main() {
     // DefaultPlugins ajoute les briques de bases 
     // pour la création rapide d'un jeu.
     app.add_plugins((
-        DefaultPlugins,
+        DefaultPlugins.set(ImagePlugin {
+            default_sampler: bevy::render::texture::ImageSamplerDescriptor::nearest()
+        }),
         joueur::PluginJoueur
     ));
 
@@ -26,12 +28,10 @@ fn main() {
 }
 
 fn setup(mut commands: Commands) {
-    commands.spawn(Camera2dBundle {
-        camera: Camera {
-            // Couleur du fond de l'écran
-            clear_color: ClearColorConfig::Custom(WHITE.into()),
-            ..default()
-        },
-        ..default()
-    });
+    let mut camera = Camera2dBundle::default();
+
+    camera.camera.clear_color = ClearColorConfig::Custom(WHITE.into());
+    camera.projection.scale = 0.5;
+    
+    commands.spawn(camera);
 }

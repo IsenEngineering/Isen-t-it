@@ -3,7 +3,7 @@ use crate::composants::Velocity;
 
 // Constantes
 
-const PLAYER_SPRITESHEET: &str = "dino/doux.png";
+const PLAYER_SPRITESHEET: &str = "dino/mort.png";
 const PLAYER_SPEED: f32 = 50.0;
 
 // Plugin/Setup:
@@ -16,7 +16,7 @@ impl Plugin for PluginJoueur {
         app.add_systems(Startup, setup);
 
         // à chaque image
-        app.add_systems(Update, move_sprite);
+        app.add_systems(Update, (move_sprite, animate_sprite));
     }
 }
 
@@ -44,7 +44,8 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>,
         TextureAtlas {
             layout: texture_atlas_layout,
             index: 0,
-        }
+        },
+        AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating))
     ));
 }
 
@@ -70,5 +71,40 @@ fn move_sprite(keyboard: Res<ButtonInput<KeyCode>>,
     }
     if keyboard.pressed(KeyCode::KeyD) {
         v.dx += PLAYER_SPEED;
+    }
+}
+
+// Composant contenant l'état de l'animation
+#[derive(Component)]
+struct AnimationTimer(Timer);
+
+fn animate_sprite(
+    time: Res<Time>,
+    mut query: Query<(
+        &Velocity,
+        &mut AnimationTimer,
+        &mut TextureAtlas,
+        &mut Sprite
+    )>,
+) {
+    for (velocity, mut timer, mut texture, mut sprite) in query.iter_mut() {
+        // Update the animation timer
+        timer.0.tick(time.delta());
+
+        // Check if the entity is moving
+        let is_moving = velocity.dx != 0.0 || velocity.dy != 0.0;
+        sprite.flip_x = velocity.dx < 0.0;
+
+        if is_moving && timer.0.finished() {
+            if texture.index == 0 {
+                texture.index = 4
+            } else {
+                // Cycle through frames if moving
+                texture.index = 4 + (texture.index - 3) % 6; // Assuming 4 frames
+            }
+        } else if !is_moving {
+            // Reset to the first frame when not moving
+            texture.index = 0;
+        }
     }
 }
