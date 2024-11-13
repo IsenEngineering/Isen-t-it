@@ -1,12 +1,15 @@
 use bevy::prelude::*;
 use crate::composants::Velocity;
 
-// Constantes
+/*   Constantes  */
 
+// Fichier du sprite (le personnage avec ses animations)
 const PLAYER_SPRITESHEET: &str = "dino/mort.png";
+// Vitesse maximum d'un personnage
 const PLAYER_SPEED: f32 = 50.0;
+const PLAYER_SPRINT_SPEED: f32 = 100.0;
 
-// Plugin/Setup:
+/* Plugin */
     
 pub struct PluginJoueur;
 
@@ -20,31 +23,49 @@ impl Plugin for PluginJoueur {
     }
 }
 
+/* Systèmes */
+
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>, 
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>) {
+
+    // Les animations du personnage
     let texture = asset_server.load(PLAYER_SPRITESHEET);
+    // Les images de l'animation sur une grille
     let layout = TextureAtlasLayout::from_grid(
         UVec2::splat(24), 24, 1, None, None);
+
+    // Un utilitaire qui permet de manipuler 
+    // quelle image de l'animation on affiche
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
 
+    // On spawn l'entité
     commands.spawn((
         SpriteBundle {
             texture,
             transform: Transform {
+                // On la dépose vers le centre
                 translation: Vec3::new(100., 0., 0.),
+                // On double sa taille
                 scale: Vec3::new(2., 2., 1.),
                 ..default()
             },
             ..default()
         },
+        // On lui donne une velocité, 
+        // sa position est alors mise à jour.
         Velocity {
             dx: 0.0,
             dy: 0.0
         },
+
+        // L'utilitaire qui gère l'image de l'animation affichée
         TextureAtlas {
             layout: texture_atlas_layout,
             index: 0,
         },
+
+        // On ajoute un composant contenant l'état 
+        // de l'animation (basiquement le temps entre chaque image).
         AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating))
     ));
 }
@@ -52,25 +73,30 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>,
 
 fn move_sprite(keyboard: Res<ButtonInput<KeyCode>>,
     mut sprite_position: Query<&mut Velocity, With<Sprite>>) {
-    // La vélocité du sprite
-    let mut v = sprite_position.single_mut();
+    // Il n'y a par défaut qu'un unique sprite.
+    let mut v: Mut<'_, Velocity> = sprite_position.single_mut();
 
-    // Mouvements sur l'axe Y
+    let norme: f32 = match keyboard.pressed(KeyCode::ShiftLeft) {
+        true => PLAYER_SPRINT_SPEED,
+        false => PLAYER_SPEED
+    };
+
+    // On donne un mouvement sur l'axe Y
     v.dy = 0.0;
     if keyboard.pressed(KeyCode::KeyW) {
-        v.dy += PLAYER_SPEED;
+        v.dy += norme;
     }
     if keyboard.pressed(KeyCode::KeyS) {
-        v.dy -= PLAYER_SPEED;
+        v.dy -= norme;
     } 
     
-    // Mouvements sur l'axe X
+    // On donne un mouvement sur l'axe X
     v.dx = 0.0;
     if keyboard.pressed(KeyCode::KeyA) {
-        v.dx -= PLAYER_SPEED;
+        v.dx -= norme;
     }
     if keyboard.pressed(KeyCode::KeyD) {
-        v.dx += PLAYER_SPEED;
+        v.dx += norme;
     }
 }
 
@@ -88,22 +114,44 @@ fn animate_sprite(
     )>,
 ) {
     for (velocity, mut timer, mut texture, mut sprite) in query.iter_mut() {
-        // Update the animation timer
+        // On mets à jour l'état de l'animation
         timer.0.tick(time.delta());
 
-        // Check if the entity is moving
+        // On vérifie si l'entité est en mouvement.
         let is_moving = velocity.dx != 0.0 || velocity.dy != 0.0;
-        sprite.flip_x = velocity.dx < 0.0;
+        let is_sprinting = velocity.dx.abs() >= PLAYER_SPRINT_SPEED || 
+            velocity.dy.abs() >= PLAYER_SPRINT_SPEED;
+        if velocity.dx != 0.0 {
+            // On ajuste le côté où regarde 
+            // l'entité si elle est mouvement.
+            sprite.flip_x = velocity.dx < 0.0;
+        }
 
-        if is_moving && timer.0.finished() {
-            if texture.index == 0 {
+        // Dans le cas où l'entité bouge, on l'anime.
+        if is_moving && !is_sprinting && timer.0.finished() {
+            // Première image = 4
+            // Dernière image = 9
+            if texture.index < 4 || texture.index > 9 {
+                // Première image de l'animation
                 texture.index = 4
             } else {
-                // Cycle through frames if moving
-                texture.index = 4 + (texture.index - 3) % 6; // Assuming 4 frames
+                // On passe sur chaque image de l'animation de course.
+
+                texture.index = 4 + (texture.index - 3) % 6;
+            }
+        } else if is_moving && is_sprinting && timer.0.finished() {
+            // Première image = 17
+            // Dernière image = 23
+            if texture.index < 17 || texture.index > 23 {
+                // Première image de l'animation
+                texture.index = 17
+            } else {
+                // On passe sur chaque image de l'animation de course.
+
+                texture.index = 17 + (texture.index - 16) % 7;
             }
         } else if !is_moving {
-            // Reset to the first frame when not moving
+            // L'image par défaut.
             texture.index = 0;
         }
     }
