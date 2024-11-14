@@ -4,6 +4,9 @@ use bevy::{
 };
 use bevy_framepace::FramepacePlugin;
 
+#[derive(Resource)]
+pub struct Debug(bool);
+
 // A unit struct to help identify the FPS UI component, since there may be many Text components
 #[derive(Component)]
 struct FpsText;
@@ -12,13 +15,20 @@ pub struct PluginFPS;
 
 impl Plugin for PluginFPS {
     fn build(&self, app: &mut App) {
+        app.insert_resource(Debug(false));
         app.add_plugins((
             FrameTimeDiagnosticsPlugin, 
             FramepacePlugin
         ));
-        app.add_systems(Startup, setup);
-        app.add_systems(Update, text_update_system);
+        app.add_systems(Startup, 
+            setup);
+        app.add_systems(Update, 
+            text_update_system.run_if(is_debug));
     }
+}
+
+pub fn is_debug(debug: Res<Debug>) -> bool {
+    debug.0
 }
 
 fn setup(mut commands: Commands) {

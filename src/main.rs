@@ -8,6 +8,7 @@ mod joueur;
 mod scene;
 mod systems;
 mod performance;
+mod collisions;
 
 fn main() {
     let mut app = App::new();
@@ -20,7 +21,8 @@ fn main() {
         }),
         joueur::PluginJoueur,
         scene::PluginScene,
-        performance::PluginFPS
+        performance::PluginFPS,
+        collisions::PluginCollisions
     ));
 
     // Au démarrage
@@ -39,8 +41,7 @@ fn setup(mut commands: Commands) {
     let mut camera: Camera2dBundle = Camera2dBundle::default();
 
     camera.camera.clear_color = ClearColorConfig::Custom(WHITE.into());
-    camera.transform.translation.y = 24.0;
+    camera.transform.translation.y = 36.0;
     
     commands.spawn(camera);
-
 }

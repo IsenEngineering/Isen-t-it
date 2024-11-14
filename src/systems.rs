@@ -1,14 +1,29 @@
 use bevy::{prelude::*, window::WindowResized};
 use crate::composants::Velocity;
+use crate::collisions::{point_in_area, CollisionArea};
 
 // Mets en mouvements toutes les entités 
 // ayant le composant "transform" et une velocité.
 pub fn movement_system(
 	time: Res<Time>,
+    collisions: Query<&CollisionArea>,
 	mut query: Query<(&mut Transform, &Velocity)>,
 ) {
 	for (mut transform, velocity) in query.iter_mut() {
 		let translation: &mut Vec3 = &mut transform.translation;
+        let mut outside = false;
+        for area in collisions.iter() {
+            if !point_in_area(Vec2::from([
+                translation.x + velocity.dx * time.delta_seconds(),
+                translation.y + velocity.dy * time.delta_seconds()
+            ]), area) {
+                outside = true
+            }
+        }
+        if outside {
+            continue;
+        }
+        
 		translation.x += velocity.dx * time.delta_seconds();
 		translation.y += velocity.dy * time.delta_seconds();
 	}
@@ -38,7 +53,7 @@ pub fn on_resize_system(
 ) {
     for e in resize_reader.read() {
         for mut projection in q.iter_mut() {
-            projection.scale = 48.0 / e.height;
+            projection.scale = 72.0 / e.height;
         }
     }
 }
