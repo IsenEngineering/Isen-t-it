@@ -44,9 +44,8 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>,
             texture,
             transform: Transform {
                 // On la dépose vers le centre
-                translation: Vec3::new(0., 0., 0.),
-                // On double sa taille
-                scale: Vec3::new(2., 2., 1.),
+                translation: Vec3::new(24., 24., 2.),
+                scale: Vec3::new(1., 1., 1.),
                 ..default()
             },
             ..default()
@@ -70,11 +69,10 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>,
     ));
 }
 
-
 fn move_sprite(keyboard: Res<ButtonInput<KeyCode>>,
     mut sprite_position: Query<&mut Velocity, With<Sprite>>) {
     // Il n'y a par défaut qu'un unique sprite.
-    let mut v: Mut<'_, Velocity> = sprite_position.single_mut();
+    let mut v = sprite_position.single_mut();
 
     let norme: f32 = match keyboard.pressed(KeyCode::ShiftLeft) {
         true => PLAYER_SPRINT_SPEED,

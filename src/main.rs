@@ -7,6 +7,7 @@ mod composants;
 mod joueur;
 mod scene;
 mod systems;
+mod performance;
 
 fn main() {
     let mut app = App::new();
@@ -17,14 +18,13 @@ fn main() {
         DefaultPlugins.set(ImagePlugin {
             default_sampler: bevy::render::texture::ImageSamplerDescriptor::nearest()
         }),
-        joueur::PluginJoueur
+        joueur::PluginJoueur,
+        scene::PluginScene,
+        performance::PluginFPS
     ));
 
     // Au démarrage
-    app.add_systems(Startup, (
-        setup, 
-        scene::setup
-    ));
+    app.add_systems(Startup, setup);
 
     // à chaque image
     app.add_systems(Update, (
@@ -39,7 +39,8 @@ fn setup(mut commands: Commands) {
     let mut camera: Camera2dBundle = Camera2dBundle::default();
 
     camera.camera.clear_color = ClearColorConfig::Custom(WHITE.into());
-    camera.projection.scale = 0.2;
+    camera.transform.translation.y = 24.0;
     
     commands.spawn(camera);
+
 }
