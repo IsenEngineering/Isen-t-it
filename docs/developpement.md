@@ -3,7 +3,7 @@
 
 Bienvenue, ce guide vise à vous montrer la voie pour participer au développement du projet. 
 
-![Alaide](https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExNW1qNTdlcW41N3V1bjF2d28zNjhrMHk3Ym5tYmFyOHNlbzc5OTVheSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/pUVOeIagS1rrqsYQJe/giphy.gif)
+![Alaide](https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExMnk1OWo5MXR5dXBzZGI2MnYwMDIwcnhydmJnaWxnM3BndDNqeTR0ZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ifeW9wTv01cHDocrY2/giphy.gif)
 
 ---
 
@@ -101,9 +101,9 @@ fn move_joueur(keyboard: ..., mut joueurs: Query<&mut Joueur>) {
 
 Exemples dans le projet:
 
-[Création d'une entité](../src/joueur.rs) à la ligne 42 (le 15/11/2024 à 22h)
-[Composant](../src/collisions.rs) à la ligne 20 (le 15/11/2024 à 22h). Il s'agit d'un composant qui représente un polygone pour le système de collision.
-[Système](../src/collisions.rs) à la ligne 31 (le 15/11/2024 à 22h). Il s'agit du système de debuggage qui dessine sur l'écran les bordures des polygones (en l'occurence il n'y a qu'un polygone).
+- [Création d'une entité](../src/joueur.rs) l'instruction `commands.spawn(...) dans le système/ la fonction setup`
+- [Composant](../src/collisions.rs) `... struct CollisionArea(...)` ~ligne 19. Il s'agit d'un composant qui représente un polygone pour le système de collision.
+- [Système](../src/collisions.rs) `fn draw_collisions(...) ...` ~ligne 32. Il s'agit du système de debuggage qui dessine sur l'écran les bordures des polygones (en l'occurence il n'y a qu'un polygone).
 
 ## Isen't it
 

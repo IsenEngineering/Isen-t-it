@@ -20,8 +20,11 @@ impl Plugin for PluginFPS {
             FrameTimeDiagnosticsPlugin, 
             FramepacePlugin
         ));
+
+        // On affiche les FPS uniquement si le jeu 
+        // est en mode développement / débug
         app.add_systems(Startup, 
-            setup);
+            setup.run_if(is_debug));
         app.add_systems(Update, 
             text_update_system.run_if(is_debug));
     }

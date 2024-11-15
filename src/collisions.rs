@@ -14,12 +14,12 @@ impl Plugin for PluginCollisions {
 // Collisions
 
 // Le système de collision vérifira 
-// que le joueur est bien dans l'un des polygones présents
-// dans CollisionArea
+// que le joueur est bien dans l'un des polygones (CollisionArea)
 #[derive(Component)]
 pub struct CollisionArea(Vec<Vec2>);
 
 fn setup(mut commands: Commands) {
+    // Le polygone du premier étage
     commands.spawn(CollisionArea(Vec::from([
         Vec2::new(-20., 9.),
         Vec2::new(452., 9.),
@@ -28,17 +28,24 @@ fn setup(mut commands: Commands) {
     ])));
 }
 
+// Ce système de débuggage dessine les bordures des zones de collisions
 fn draw_collisions(collisions: Query<&CollisionArea>, mut draw: Gizmos) {
+    // En rouge
     let c = Color::linear_rgb(255.0, 0.0, 0.0);
 
+    // Chaque zones de collisions
     for area in collisions.iter() {
+        // Nombre de sommets
         let n = area.0.len();
         for i in 0..n {
+            // On dessine un trait entre les sommets adjacents
             draw.line_2d(area.0[i], area.0[(i + 1) % n], c);
-         }
-     }
+        }
+    }
 }
 
+// Fonction qui vérifie qu'un point est bien dans un polygone
+// Code généré par Github Copilot
 pub fn point_in_area(point: Vec2, polygon: &CollisionArea) -> bool {
     let mut is_inside = false;
     let mut j = polygon.0.len() - 1;
@@ -54,6 +61,7 @@ pub fn point_in_area(point: Vec2, polygon: &CollisionArea) -> bool {
     is_inside
 }
 
+// Tests pour vérifier que la fonction ci-dessus fonctionne correctement
 #[cfg(test)]
 mod tests {
     use bevy::prelude::*;
@@ -82,9 +90,10 @@ mod tests {
         for point in points_hors_polygon {
             assert_eq!(false, point_in_area(point, &polygon));
         }
+        println!("Points hors du polygone ✅");
 
         assert_eq!(true, point_in_area(points_du_polygon, &polygon));
-
+        println!("Points du polygone ✅");
     }
 
     #[test]

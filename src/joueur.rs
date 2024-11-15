@@ -5,8 +5,9 @@ use crate::composants::Velocity;
 
 // Fichier du sprite (le personnage avec ses animations)
 const PLAYER_SPRITESHEET: &str = "dino/mort.png";
-// Vitesse maximum d'un personnage
+// Vitesse  d'un personnage
 const PLAYER_SPEED: f32 = 50.0;
+// Vitesse  d'un personnage en sprint
 const PLAYER_SPRINT_SPEED: f32 = 100.0;
 
 /* Plugin */
@@ -43,7 +44,9 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>,
         SpriteBundle {
             texture,
             transform: Transform {
-                // On la dépose vers le centre
+                // z: 2 pour que le joueur soit au dessus du fond
+
+                // On la dépose au centre
                 translation: Vec3::new(24., 24., 2.),
                 scale: Vec3::new(1., 1., 1.),
                 ..default()
@@ -51,13 +54,13 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>,
             ..default()
         },
         // On lui donne une velocité, 
-        // sa position est alors mise à jour.
+        // sa position est alors mise à jours.
         Velocity {
             dx: 0.0,
             dy: 0.0
         },
 
-        // L'utilitaire qui gère l'image de l'animation affichée
+        // L'utilitaire qui gères l'image de l'animation affichée
         TextureAtlas {
             layout: texture_atlas_layout,
             index: 0,
@@ -74,7 +77,9 @@ fn move_sprite(keyboard: Res<ButtonInput<KeyCode>>,
     // Il n'y a par défaut qu'un unique sprite.
     let mut v = sprite_position.single_mut();
 
+    // Norme du vecteur de velocité
     let norme: f32 = match keyboard.pressed(KeyCode::ShiftLeft) {
+        // appuyer sur shift permet de courir plus vite
         true => PLAYER_SPRINT_SPEED,
         false => PLAYER_SPEED
     };
@@ -135,6 +140,9 @@ fn animate_sprite(
         if velocity.dx != 0.0 {
             // On ajuste le côté où elle regarde.
             sprite.flip_x = velocity.dx < 0.0;
+
+            // Notez que flip_x est un boolean, 
+            // on assigne bien une condition <=> un boolean
         }
 
         // Dans le cas où l'entité bouge, on l'anime.
