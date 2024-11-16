@@ -31,7 +31,7 @@ Maintenant, pourquoi **Bevy** ?
 
 ## Rust
 
-![Ruuusst](https://www.rust-lang.org/static/images/rust-logo-blk.svg)
+![Ruuusst](https://rustacean.net/assets/rustacean-flat-happy.png)
 
 Si vous souhaitez être vraiment impliqué et participer grandement au projet, il faut passer par l'apprentissage du language.
 *Livio*: « Les bases du language sont amplement suffisantes pour ce projet, on peut ne pas comprendre tous les concepts de Rust pour démarrer. »
