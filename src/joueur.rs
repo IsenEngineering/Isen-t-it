@@ -109,12 +109,12 @@ struct AnimationTimer(Timer);
 
 // Trouve l'indice de l'image suivante de l'animation
 fn update_animation(indice: usize, min: usize, max: usize) -> usize {
-    if indice < min || indice > max {
+    return if indice < min || indice > max {
         // Première image de l'animation
-        return min
+        min
     } else {
         // On passe sur chaque image de l'animation de course.
-        return min + (indice + 1 - min) % (max - min);
+        min + (indice + 1 - min) % (max - min)
     }
 }
 
