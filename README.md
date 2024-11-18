@@ -9,4 +9,4 @@ L'idée est d'apprendre en modifiant et créant.
 
 Idéalement, le développement du projet sera assuré par plusieurs pôles (Le pôle serveur, le pôle dev de l'Isen Engineering et le Bureau des Arts si possible)
 
-## [Guide de développement](./docs/developpement.md)
+## [Guides de développement](./docs/sommaire.md)

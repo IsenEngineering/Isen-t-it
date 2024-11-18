@@ -15,7 +15,7 @@ pub struct PluginFPS;
 
 impl Plugin for PluginFPS {
     fn build(&self, app: &mut App) {
-        app.insert_resource(Debug(false));
+        app.insert_resource(Debug(true));
         app.add_plugins((
             FrameTimeDiagnosticsPlugin, 
             FramepacePlugin
