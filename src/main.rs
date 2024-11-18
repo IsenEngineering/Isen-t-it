@@ -1,6 +1,5 @@
 use bevy::{
-    color::palettes::css::WHITE,
-    prelude::*
+    color::palettes::css::WHITE, core_pipeline::tonemapping::Tonemapping, prelude::*
 };
 
 mod composants;
@@ -9,6 +8,7 @@ mod scene;
 mod systems;
 mod performance;
 mod collisions;
+mod lumieres;
 
 fn main() {
     let mut app = App::new();
@@ -24,8 +24,9 @@ fn main() {
         }),
         joueur::PluginJoueur,
         scene::PluginScene,
-        performance::PluginFPS,
-        collisions::PluginCollisions
+        performance::PluginPerf,
+        collisions::PluginCollisions,
+        lumieres::PluginLumieres
     ));
 
     // Au démarrage
@@ -41,8 +42,14 @@ fn main() {
 }
 
 fn setup(mut commands: Commands) {
+    
+
     // On mets une camera, autrement on pourrait pas voir ce qu'il se passe...
     let mut camera: Camera2dBundle = Camera2dBundle::default();
+
+
+    camera.camera.hdr = true;
+    camera.tonemapping = Tonemapping::Reinhard;
 
     // Fond blanc
     camera.camera.clear_color = ClearColorConfig::Custom(WHITE.into());

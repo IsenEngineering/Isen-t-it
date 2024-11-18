@@ -1,8 +1,6 @@
-use bevy::{
-    prelude::*, 
-    diagnostic::{DiagnosticsStore, FrameTimeDiagnosticsPlugin}
-};
+use bevy::prelude::*;
 use bevy_framepace::FramepacePlugin;
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
 #[derive(Resource)]
 pub struct Debug(bool);
@@ -11,15 +9,14 @@ pub struct Debug(bool);
 #[derive(Component)]
 struct FpsText;
 
-pub struct PluginFPS;
+pub struct PluginPerf;
 
-impl Plugin for PluginFPS {
+impl Plugin for PluginPerf {
     fn build(&self, app: &mut App) {
         app.insert_resource(Debug(true));
-        app.add_plugins((
-            FrameTimeDiagnosticsPlugin, 
-            FramepacePlugin
-        ));
+        app.insert_resource(LastUpdate(0.0));
+        app.add_plugins(FramepacePlugin);
+        app.add_plugins(WorldInspectorPlugin::new().run_if(is_debug));
 
         // On affiche les FPS uniquement si le jeu 
         // est en mode développement / débug
@@ -37,32 +34,35 @@ pub fn is_debug(debug: Res<Debug>) -> bool {
 fn setup(mut commands: Commands) {
     commands.spawn((
         TextBundle::from_sections([
-            TextSection::new(
-                "FPS: ",
-                TextStyle {
-                    font_size: 60.0,
-                    ..default()
-                },
-            ),
             TextSection::from_style(TextStyle {
-                font_size: 60.0,
+                font_size: 24.0,
                 ..default()
             }),
+            TextSection::new(
+                " ms",
+                TextStyle {
+                    font_size: 24.0,
+                    ..default()
+                },
+            )
         ]),
         FpsText,
     ));
 }
 
+#[derive(Resource)]
+struct LastUpdate(f64);
+
 fn text_update_system(
-    diagnostics: Res<DiagnosticsStore>,
+    mut last_update: ResMut<LastUpdate>,
+    time: Res<Time>,
     mut query: Query<&mut Text, With<FpsText>>,
 ) {
-    for mut text in &mut query {
-        if let Some(fps) = diagnostics.get(&FrameTimeDiagnosticsPlugin::FPS) {
-            if let Some(value) = fps.smoothed() {
-                // Update the value of the second section
-                text.sections[1].value = format!("{value:.2}");
-            }
+    if last_update.0 + 0.25 < time.elapsed_seconds_f64() {
+        for mut text in &mut query {
+            let tm = time.delta_seconds_f64() * 1000.;
+            text.sections[0].value = format!("{tm:.2}");
         }
+        last_update.0 = time.elapsed_seconds_f64();
     }
 }
