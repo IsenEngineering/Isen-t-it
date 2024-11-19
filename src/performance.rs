@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use bevy_framepace::FramepacePlugin;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
 #[derive(Resource)]
@@ -15,7 +14,6 @@ impl Plugin for PluginPerf {
     fn build(&self, app: &mut App) {
         app.insert_resource(Debug(true));
         app.insert_resource(LastUpdate(0.0));
-        app.add_plugins(FramepacePlugin);
         app.add_plugins(WorldInspectorPlugin::new().run_if(is_debug));
 
         // On affiche les FPS uniquement si le jeu 

@@ -49,7 +49,7 @@ fn setup(mut commands: Commands) {
 
 
     camera.camera.hdr = true;
-    camera.tonemapping = Tonemapping::Reinhard;
+    camera.tonemapping = Tonemapping::TonyMcMapface;
 
     // Fond blanc
     camera.camera.clear_color = ClearColorConfig::Custom(WHITE.into());
