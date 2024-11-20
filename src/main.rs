@@ -16,11 +16,19 @@ fn main() {
     // DefaultPlugins ajoute les briques de bases 
     // pour la création rapide d'un jeu.
     app.add_plugins((
-        DefaultPlugins.set(ImagePlugin {
+        DefaultPlugins
+        .set(ImagePlugin {
             // Ce "sampler" donne un look pixelisé au jeu,
             // Vous pouvez essayer en supprimant cette ligne, 
             // toutes les images seraient floues
             default_sampler: bevy::render::texture::ImageSamplerDescriptor::nearest()
+        })
+        .set(WindowPlugin {
+            primary_window: Some( Window{
+                canvas: Some("#bevy-canvas".to_string()),
+                ..default()
+            }),
+            ..default()
         }),
         joueur::PluginJoueur,
         scene::PluginScene,

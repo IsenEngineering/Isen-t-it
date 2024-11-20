@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Isen't It</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="bevy-canvas">
+    </canvas>
+    <script type="module">
+        const canvas = document.getElementById('bevy-canvas');
+        if(canvas) {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        import init from './js/isent_it.js';
+        init();
+    </script>
+</body>
+</html>
