@@ -10,3 +10,5 @@ Bienvenue, ce guide vise à vous montrer la voie pour participer au développeme
 ## [Installation du projet](./installation.md)
 
 ## [Fonctionnement de la coopération](./organisation.md)
+
+## [Code de jeux existants à lire](./jeux.md)
