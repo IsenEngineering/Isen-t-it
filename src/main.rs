@@ -1,6 +1,4 @@
-use bevy::{
-    color::palettes::css::WHITE, core_pipeline::tonemapping::Tonemapping, prelude::*
-};
+use bevy::prelude::*;
 
 mod composants;
 mod joueur;
@@ -29,9 +27,6 @@ fn main() {
         lumieres::PluginLumieres
     ));
 
-    // Au démarrage
-    app.add_systems(Startup, setup);
-
     // à chaque image
     app.add_systems(Update, (
         systems::movement_system, 
@@ -39,23 +34,4 @@ fn main() {
         systems::camera_follow_system
     ));
     app.run();
-}
-
-fn setup(mut commands: Commands) {
-    
-
-    // On mets une camera, autrement on pourrait pas voir ce qu'il se passe...
-    let mut camera: Camera2dBundle = Camera2dBundle::default();
-
-
-    camera.camera.hdr = true;
-    camera.tonemapping = Tonemapping::Reinhard;
-
-    // Fond blanc
-    camera.camera.clear_color = ClearColorConfig::Custom(WHITE.into());
-    
-    // On centre l'axe y de la camera sur le premier étage
-    camera.transform.translation.y = 36.0;
-    
-    commands.spawn(camera);
 }

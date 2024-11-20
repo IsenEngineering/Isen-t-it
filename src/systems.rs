@@ -68,17 +68,14 @@ pub fn camera_follow_system(
         Err(_) => return,
     };
 
-    let mut cam = match camera_query.get_single_mut() {
-        Ok(transform) => transform,
-        Err(_) => return,
-    };
-
-    let delta: Vec3 = player.translation - cam.translation;
-
-    // * time.delta_seconds() assure que la camera suit au 
-    // fur et à mesure le joueur et pas de façon immédiate
-    // * 4.0 assure que la caméra va plus vite que le personnage
-	cam.translation.x += delta.x * time.delta_seconds() * 4.0;
+    for mut cam in camera_query.iter_mut() {
+        let delta: Vec3 = player.translation - cam.translation;
+    
+        // * time.delta_seconds() assure que la camera suit au 
+        // fur et à mesure le joueur et pas de façon immédiate
+        // * 4.0 assure que la caméra va plus vite que le personnage
+        cam.translation.x += delta.x * time.delta_seconds() * 4.0;
+    }
 }
 
 /* Ce système ajuste la projection de la caméra en fonction de sa taille.
