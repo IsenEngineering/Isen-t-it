@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use std::env;
 
 #[derive(Resource)]
 pub struct Debug(bool);
@@ -12,7 +13,14 @@ pub struct PluginPerf;
 
 impl Plugin for PluginPerf {
     fn build(&self, app: &mut App) {
-        app.insert_resource(Debug(true));
+        let debug = match env::var("debug") {
+            Ok(v) => v,
+            _ => "false".to_string()
+        };
+
+        app.insert_resource(
+            Debug(debug.contains("true"))
+        );
         app.insert_resource(LastUpdate(0.0));
         app.add_plugins(WorldInspectorPlugin::new().run_if(is_debug));
 
