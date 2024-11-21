@@ -1,5 +1,5 @@
 use bevy::{prelude::*, window::WindowResized};
-use crate::composants::Velocity;
+use crate::joueur::Velocity;
 use crate::collisions::{point_in_area, CollisionArea};
 
 /*

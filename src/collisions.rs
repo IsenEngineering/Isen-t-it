@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use crate::performance::is_debug;
+use crate::debug::is_debug;
 
 pub struct PluginCollisions;
 impl Plugin for PluginCollisions {

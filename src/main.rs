@@ -3,10 +3,9 @@ use bevy::{
 };
 use dotenv::dotenv;
 
-mod composants;
 mod joueur;
 mod systems;
-mod performance;
+mod debug;
 mod collisions;
 mod lumieres;
 mod monde;
@@ -34,9 +33,9 @@ fn main() {
             }),
             ..default()
         }),
-        joueur::PluginJoueur,
+        joueur::Joueur,
         monde::Monde,
-        performance::PluginPerf,
+        debug::PluginPerf,
         collisions::PluginCollisions,
         lumieres::PluginLumieres
     ));
