@@ -1,16 +1,20 @@
 use bevy::{
     color::palettes::css::WHITE, core_pipeline::tonemapping::Tonemapping, prelude::*
 };
+use dotenv::dotenv;
 
 mod composants;
 mod joueur;
-mod scene;
 mod systems;
 mod performance;
 mod collisions;
 mod lumieres;
+mod monde;
 
 fn main() {
+    // On charge les variables d'environnement contenus dans le fichier .env
+    // il peut notamnent contenir `DEBUG="true"`
+    dotenv().ok();
     let mut app = App::new();
     
     // DefaultPlugins ajoute les briques de bases 
@@ -31,7 +35,7 @@ fn main() {
             ..default()
         }),
         joueur::PluginJoueur,
-        scene::PluginScene,
+        monde::Monde,
         performance::PluginPerf,
         collisions::PluginCollisions,
         lumieres::PluginLumieres

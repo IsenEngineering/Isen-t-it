@@ -1,7 +1,7 @@
 use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
 
-const SCENE_FILE_PATH: &str = "maquette.png";
-const SOL_FILE_PATH: &str = "sol.png";
+const SCENE_FILE_PATH: &str = "monde/maquette.png";
+const SOL_FILE_PATH: &str = "monde/sol.png";
 
 pub struct PluginScene;
 
