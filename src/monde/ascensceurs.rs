@@ -18,15 +18,16 @@ fn setup(mut commands: Commands,
 
     // On charge l'image de l'ascenseur
     let ascenseur = asset_server.load(ASCENSEUR_PATH);
+    let material = materials.add(ColorMaterial {
+        texture: Some(ascenseur.clone()),
+        ..default()
+    });
 
     // Pour chaque étage
     for i in 0..7 {
         commands.spawn(MaterialMesh2dBundle {
             mesh: meshes.add(Rectangle::default()).into(),
-            material: materials.add(ColorMaterial {
-                texture: Some(ascenseur.clone()),
-                ..default()
-            }),
+            material: material.clone(),
             transform: Transform {
                 translation: Vec3::new(
                     // 6 ème carré de la largeur et au milieu

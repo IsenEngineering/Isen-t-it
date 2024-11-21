@@ -62,6 +62,8 @@ pub fn point_in_area(point: Vec2, polygon: &CollisionArea) -> bool {
 }
 
 // Tests pour vérifier que la fonction ci-dessus fonctionne correctement
+// On peut lancer les tests via un bouton ci-contre avec VSCode ou 
+// avec la commande `cargo test`
 #[cfg(test)]
 mod tests {
     use bevy::prelude::*;

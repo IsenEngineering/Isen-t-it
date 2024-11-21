@@ -2,7 +2,7 @@ use bevy::{
     prelude::*,
     diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin},
 };
-use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use bevy_editor_pls::EditorPlugin;
 use std::env;
 
 #[derive(Resource)]
@@ -22,7 +22,7 @@ impl Plugin for PluginPerf {
         // si l'utilisateur est en mode debug.
         if debug == "true" {
             app.add_plugins((
-                WorldInspectorPlugin::new(),
+                EditorPlugin::new(),
                 FrameTimeDiagnosticsPlugin,
                 LogDiagnosticsPlugin::default()
             ));
