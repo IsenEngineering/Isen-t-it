@@ -25,7 +25,7 @@ Maintenant, pourquoi **Bevy** ?
 ![Ruuusst](https://rustacean.net/assets/rustacean-flat-happy.png)
 
 Si vous souhaitez être vraiment impliqué et participer grandement au projet, il faut passer par l'apprentissage du language.
-*Livio*: « Les bases du language sont amplement suffisantes pour ce projet, on peut ne pas comprendre tous les concepts de Rust pour démarrer. »
+*Livio (リビオ)*: « Les bases du language sont amplement suffisantes pour ce projet, on peut ne pas comprendre tous les concepts de Rust pour démarrer. »
 
 Sur [le site du language](https://www.rust-lang.org/fr), vous trouverez beaucoup d'informations très utiles notamnent la documentation ... 
 

@@ -2,6 +2,25 @@ use bevy::prelude::*;
 use crate::joueur::Velocity;
 use crate::joueur::{PLAYER_SPEED, PLAYER_SPRINT_SPEED};
 
+pub fn move_sprite_touches(touches: Res<Touches>,
+    mut sprite_position: Query<&mut Velocity, With<Sprite>>) {
+    let mut v = sprite_position.single_mut();
+    for touch in touches.iter() {
+        let pos = touch.position();
+
+        v.dy = if pos.y > 0.0 {
+            PLAYER_SPEED
+        } else {
+            -PLAYER_SPEED
+        };
+        v.dx = if pos.x > 0.0 {
+            PLAYER_SPEED
+        } else {
+            -PLAYER_SPEED
+        }
+    }
+}
+
 pub fn move_sprite(keyboard: Res<ButtonInput<KeyCode>>,
     mut sprite_position: Query<&mut Velocity, With<Sprite>>) {
     // Il n'y a par défaut qu'un unique sprite.

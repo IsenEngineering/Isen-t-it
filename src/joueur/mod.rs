@@ -24,6 +24,7 @@ impl Plugin for Joueur {
         // à chaque image
         app.add_systems(Update, (
             mouvements::move_sprite, 
+            mouvements::move_sprite_touches,
             animation::animate_sprite
         ));
     }
