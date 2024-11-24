@@ -1,23 +1,16 @@
 use bevy::{
-    color::palettes::css::WHITE, 
-    core_pipeline::{bloom::BloomSettings, tonemapping::Tonemapping}, 
-    prelude::*, 
-    render::camera::RenderTarget
+    prelude::*,
+    core_pipeline::bloom::BloomSettings
 };
-use bevy_magic_light_2d::prelude::*;
+use bevy_light_2d::prelude::*;
 
 pub struct PluginLumieres;
 
 impl Plugin for PluginLumieres {
     #[cfg(not(target_arch = "wasm32"))]
     fn build(&self, app: &mut App) {
-        app.insert_resource(ClearColor(
-            Color::srgba_u8(255, 255, 255, 0)
-        ));
-        app.register_type::<OmniLightSource2D>();
-        app.add_plugins(BevyMagicLight2DPlugin);
-        app.add_systems(Startup, 
-            setup.after(setup_post_processing_camera));
+        app.add_plugins(Light2dPlugin);
+        app.add_systems(PostStartup, setup);
     }
     #[cfg(target_arch = "wasm32")]
     fn build(&self, _: &mut App) {
@@ -26,55 +19,37 @@ impl Plugin for PluginLumieres {
     }
 }
 
-fn setup(mut commands: Commands, camera_targets: Res<CameraTargets>) {
-    let mut lights = vec![];
-
+fn setup(mut commands: Commands, cameras: Query<Entity, With<Camera>>) {
     for i in 0..5 {
-        let light = commands
-            .spawn(Name::new(format!("light-{}", i)))
-            .insert(SpatialBundle::from_transform(
-                Transform::from_translation(
-                    Vec3::new(24. + 96. * i as f32, 72., 5.)
-                )
-            ))
-            .insert(OmniLightSource2D {
-                intensity:          1.5,
-                falloff:            Vec3::new(50.0, 1.0, 0.05),
-                color:              Color::srgb_u8(50, 50, 50),
+        // On mets 5 lumières sur le première étage
+        commands.spawn(PointLight2dBundle {
+            point_light: PointLight2d {
+                // La distance que couvre la lumière
+                radius: 72.0,
+                // L'intensité de la lumière
+                intensity: 2.,
+                cast_shadows: true,
                 ..default()
-            }).id();
-            lights.push(light);
+            },
+            transform: Transform {
+                // 24. <- au milieu; 96. * i <- une lumière tous les deux carrées
+                // 5. en z pour qu'elles soient au dessus du fond.
+                translation: Vec3::new(24. + 96. * i as f32, 72., 5.),
+                ..default()
+            },
+            ..default()
+        });
     }
 
-    commands.spawn((
-        SkylightLight2D {
-            color:     Color::srgb_u8(100, 100, 100),
-            intensity: 0.01,
-        },
-        Name::new("ambient_light"),
-    ));
-
-    let camera = Camera2dBundle {
-        camera: Camera {
-            clear_color: ClearColorConfig::Custom(WHITE.into()),
-            hdr: true,
-            target: RenderTarget::Image(camera_targets.floor_target.clone()),
-            ..default()
-        },
-        transform: Transform::from_translation(
-            // On centre l'axe y de la camera sur le premier étage
-            Vec3::with_y(Vec3::ZERO, 36.0)
-        ),
-        tonemapping: Tonemapping::Reinhard,
-        ..default()
-    };
-    
-    
-    commands.spawn((
-        Name::new("main_camera"),
-        camera, 
-        FloorCamera,
-        BloomSettings::OLD_SCHOOL
-    ))
-        .insert(SpriteCamera);
+    for entity in cameras.iter() {
+        // On ajoute à la caméra un effet de bloom 
+        // et une lumière ambiante faible pour pas être dans le noir.
+        commands.entity(entity).insert((
+            AmbientLight2d {
+                brightness: 0.1,
+                ..default()
+            },
+            BloomSettings::OLD_SCHOOL
+        ));
+    }
 }

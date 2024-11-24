@@ -1,4 +1,6 @@
-use bevy::prelude::*;
+use bevy::{
+    color::palettes::css::WHITE, core_pipeline::tonemapping::Tonemapping, prelude::*
+};
 
 mod joueur;
 mod systems;
@@ -38,6 +40,9 @@ fn main() {
         lumieres::PluginLumieres
     ));
 
+    // Au démarrage
+    app.add_systems(Startup, setup);
+
     // à chaque image
     app.add_systems(Update, (
         systems::movement_system, 
@@ -45,4 +50,25 @@ fn main() {
         systems::camera_follow_system
     ));
     app.run();
+}
+
+fn setup(mut commands: Commands) {
+    
+
+    // On mets une camera, autrement on pourrait pas voir ce qu'il se passe...
+    let mut camera: Camera2dBundle = Camera2dBundle::default();
+
+    // La technologie HDR permet d'améliorer les lumières
+    // On va "saturer" les couleurs (en bref)
+    camera.camera.hdr = true;
+    // jsp ce que c'est ça
+    camera.tonemapping = Tonemapping::TonyMcMapface;
+
+    // Fond blanc
+    camera.camera.clear_color = ClearColorConfig::Custom(WHITE.into());
+    
+    // On centre l'axe y de la camera sur le premier étage
+    camera.transform.translation.y = 36.0;
+    
+    commands.spawn(camera);
 }
