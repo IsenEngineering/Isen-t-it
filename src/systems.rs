@@ -12,7 +12,7 @@ use crate::collisions::{point_in_area, CollisionArea};
 pub fn movement_system(
 	time: Res<Time>,
     collisions: Query<&CollisionArea>,
-	mut query: Query<(&mut Transform, &Velocity)>,
+	mut query: Query<(&mut Transform, &Velocity), Changed<Velocity>>,
 ) {
     // On parcourt toutes entités ayant le composant Transform & Velocity
 	for (mut transform, velocity) in query.iter_mut() {

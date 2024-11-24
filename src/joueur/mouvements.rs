@@ -1,23 +1,34 @@
 use bevy::prelude::*;
+use bevy::window::PrimaryWindow;
 use crate::joueur::Velocity;
 use crate::joueur::{PLAYER_SPEED, PLAYER_SPRINT_SPEED};
 
 pub fn move_sprite_touches(touches: Res<Touches>,
-    mut sprite_position: Query<&mut Velocity, With<Sprite>>) {
+    mut sprite_position: Query<&mut Velocity, With<Sprite>>,
+    window: Query<&Window, With<PrimaryWindow>>) {
     let mut v = sprite_position.single_mut();
+    let screen = window.single();
+    let height = screen.height() as f32;
+    let width = screen.width() as f32;
+    
     for touch in touches.iter() {
-        let pos = touch.position();
+        let p = touch.position();
 
-        v.dy = if pos.y > 0.0 {
+        v.dy = if p.y > height * 0.8 {
+            -PLAYER_SPEED
+        } else if p.y < height * 0.2 {
             PLAYER_SPEED
         } else {
-            -PLAYER_SPEED
+            0.0
         };
-        v.dx = if pos.x > 0.0 {
+
+        v.dx = if p.x > width * 0.66 {
             PLAYER_SPEED
-        } else {
+        } else if p.x < width * 0.33 {
             -PLAYER_SPEED
-        }
+        } else {
+            0.0
+        };
     }
 }
 

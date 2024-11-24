@@ -26,7 +26,7 @@ pub fn animate_sprite(
         &mut AnimationTimer,
         &mut TextureAtlas,
         &mut Sprite
-    )>,
+    ), Changed<Velocity>>,
 ) {
     for (velocity, mut timer, mut texture, mut sprite) in query.iter_mut() {
         // On mets à jour l'état de l'animation

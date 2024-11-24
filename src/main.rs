@@ -1,7 +1,6 @@
 use bevy::{
     color::palettes::css::WHITE, core_pipeline::tonemapping::Tonemapping, prelude::*
 };
-use dotenv::dotenv;
 
 mod joueur;
 mod systems;
@@ -11,10 +10,6 @@ mod lumieres;
 mod monde;
 
 fn main() {
-    // On charge les variables d'environnement contenus dans le fichier .env
-    // il peut notamnent contenir `DEBUG="true"`
-    dotenv().ok();
-
     // Application Bevy
     let mut app = App::new();
     
