@@ -1,6 +1,6 @@
 use bevy::{prelude::*, window::WindowResized};
 use crate::joueur::Velocity;
-use crate::collisions::{point_in_area, CollisionArea};
+use crate::collisions::{point_in_area, CollisionArea, CollisionDisabled};
 
 /*
     Ce système doit appliquer la velocité si et uniquement si, 
@@ -11,7 +11,7 @@ use crate::collisions::{point_in_area, CollisionArea};
 */
 pub fn movement_system(
 	time: Res<Time>,
-    collisions: Query<&CollisionArea>,
+    collisions: Query<&CollisionArea, Without<CollisionDisabled>>,
 	mut query: Query<(&mut Transform, &Velocity), Changed<Velocity>>,
 ) {
     // On parcourt toutes entités ayant le composant Transform & Velocity

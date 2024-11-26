@@ -18,6 +18,9 @@ impl Plugin for PluginCollisions {
 #[derive(Component)]
 pub struct CollisionArea(Vec<Vec2>);
 
+#[derive(Component)]
+pub struct CollisionDisabled;
+
 fn setup(mut commands: Commands) {
     // Le polygone du premier étage
     commands.spawn(CollisionArea(Vec::from([
@@ -29,7 +32,7 @@ fn setup(mut commands: Commands) {
 }
 
 // Ce système de débuggage dessine les bordures des zones de collisions
-fn draw_collisions(collisions: Query<&CollisionArea>, mut draw: Gizmos) {
+fn draw_collisions(collisions: Query<&CollisionArea, Without<CollisionDisabled>>, mut draw: Gizmos) {
     // En rouge
     let c = Color::linear_rgb(255.0, 0.0, 0.0);
 
