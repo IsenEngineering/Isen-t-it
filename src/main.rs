@@ -55,8 +55,6 @@ fn main() {
 }
 
 fn setup(mut commands: Commands) {
-    
-
     // On mets une camera, autrement on pourrait pas voir ce qu'il se passe...
     let mut camera: Camera2dBundle = Camera2dBundle::default();
 
@@ -72,5 +70,5 @@ fn setup(mut commands: Commands) {
     // On centre l'axe y de la camera sur le premier étage
     camera.transform.translation.y = 36.0;
     
-    commands.spawn(camera);
+    commands.spawn((camera, IsDefaultUiCamera));
 }

@@ -1,10 +1,11 @@
 use bevy::{
     prelude::*,
-    diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin},
+    diagnostic::FrameTimeDiagnosticsPlugin
 };
 use dotenv::dotenv;
 use bevy_editor_pls::EditorPlugin;
-use std::env;
+
+mod information;
 
 #[derive(Resource)]
 pub struct Debug(bool);
@@ -17,7 +18,7 @@ impl Plugin for PluginPerf {
         // il peut notamnent contenir `DEBUG="true"`
         dotenv().ok();
 
-        let debug = match env::var("DEBUG") {
+        let debug = match std::env::var("DEBUG") {
             Ok(v) => v,
             _ => "false".to_string()
         };
@@ -25,11 +26,12 @@ impl Plugin for PluginPerf {
         app.insert_resource(Debug(debug == "true"));
         // On mets à disposition les outils de développement
         // si l'utilisateur est en mode debug.
+        app.add_systems(Startup, information::setup);
+        app.add_systems(Update, information::update);
         if debug == "true" {
             app.add_plugins((
                 EditorPlugin::new(),
-                FrameTimeDiagnosticsPlugin,
-                LogDiagnosticsPlugin::default()
+                FrameTimeDiagnosticsPlugin
             ));
         }
 
