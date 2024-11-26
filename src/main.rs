@@ -8,6 +8,7 @@ mod debug;
 mod collisions;
 mod lumieres;
 mod monde;
+mod interactions;
 
 fn main() {
     // Application Bevy
@@ -37,7 +38,8 @@ fn main() {
         monde::Monde,
         debug::PluginPerf,
         collisions::PluginCollisions,
-        lumieres::PluginLumieres
+        lumieres::PluginLumieres,
+        interactions::Interactions
     ));
 
     // Au démarrage
