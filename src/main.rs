@@ -1,5 +1,6 @@
 use bevy::{
-    color::palettes::css::WHITE, core_pipeline::tonemapping::Tonemapping, prelude::*
+    color::palettes::css::WHITE, 
+    prelude::*
 };
 
 mod joueur;
@@ -61,8 +62,6 @@ fn setup(mut commands: Commands) {
     // La technologie HDR permet d'améliorer les lumières
     // On va "saturer" les couleurs (en bref)
     camera.camera.hdr = true;
-    // jsp ce que c'est ça
-    camera.tonemapping = Tonemapping::TonyMcMapface;
 
     // Fond blanc
     camera.camera.clear_color = ClearColorConfig::Custom(WHITE.into());

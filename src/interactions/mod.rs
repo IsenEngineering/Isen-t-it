@@ -5,14 +5,18 @@ use crate::joueur::Velocity;
 
 #[derive(Component)]
 struct InteractionPoint {
+    // Intensité lorsque l'utilisateur peut intéragir
     max_intensity: f32,
-    intensity_variance: f32,
-    min_intensity: f32,
-    // La distance à laquelle l'interaction est disponible
-    // et la surbrillance arrive
-    distance: f32,
 
-    // Couleur de l'interaction lorsque le joueur est proche.
+    // Vitesse du changement d'intensité
+    intensity_variance: f32,
+
+    // Intensité lorsque l'utilisateur ne peut intéragir
+    min_intensity: f32,
+
+    // La distance à laquelle l'interaction est disponible
+    // et la surbrillance survient.
+    distance: f32,
 }
 
 pub struct Interactions;
@@ -26,24 +30,24 @@ impl Plugin for Interactions {
 
 fn setup(mut commands: Commands) {
     commands.spawn((
+        // Données du point d'intéraction
         InteractionPoint {
             distance: 12.0,
-            max_intensity: 5.0,
-            min_intensity: 2.0,
-            intensity_variance: 10.0
+            max_intensity: 2.0,
+            min_intensity: 0.5,
+            intensity_variance: 5.0,
         },
         SpatialBundle {
             transform: Transform::from_translation(Vec3::new(
                 260.5,
                 34.0,
-                1.5
+                3.0
             )),
             ..default()
         },
         PointLight2d {
-            color: Color::linear_rgb(0.5, 0.5,1.0),
-            radius: 6.0,
-            intensity: 3.0,
+            color: Color::linear_rgb(0.5, 0.5,2.0),
+            radius: 12.0,
             ..default()
         }
     )).with_children(|parent| {
@@ -71,14 +75,23 @@ fn animate_interaction(
     mut interactions_query: Query<(&mut PointLight2d, &InteractionPoint, 
         &Transform)>,
     player_query: Query<&Transform, (Changed<Transform>, With<Velocity>)>) {
+
+    // On passe sur chaque joueur
     for player in player_query.iter() {
+
+        // On passe sur chaque point de lumière
         for (mut light, point, 
             transform) 
             in interactions_query.iter_mut() {
+
+            // Si le point est trop loin du joueur on ne fait rien 
+            // (à l'exception de la correction d'intensité)
             if player.translation.distance(transform.translation) > point.distance {
                 if light.intensity > point.min_intensity {
                     light.intensity -= point.intensity_variance * time.delta_seconds();
                 }
+
+
                 continue;
             }
             if light.intensity < point.max_intensity {

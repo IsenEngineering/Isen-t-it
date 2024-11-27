@@ -16,7 +16,7 @@ pub fn update(mut text: Query<&mut Text, With<DebugFrame>>,
 
     for mut t in text.iter_mut() {
         t.sections[0].value = format!(
-            "{:.1} fps", 
+            "{:.1} FPS", 
             fps.smoothed().unwrap_or(0.0)
         );
     }
@@ -43,27 +43,23 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         ..default()
     })
     .with_children(|parent| {
+        let style = TextStyle {
+            font: font.clone(),
+            color: Color::linear_rgb(0.1, 0.1, 0.1),
+            font_size: 12.0,
+            ..default()
+        };
         parent.spawn((
             TextBundle::from_section(
-                VERSION, 
-                TextStyle {
-                    font: font.clone(),
-                    color: Color::linear_rgb(0.1, 0.1, 0.1),
-                    font_size: 12.0,
-                    ..default()
-                }
+                format!("Isen't It - {}", VERSION), 
+                style.clone()
             ),
             Label
         ));
         parent.spawn((
             TextBundle::from_section(
-                "0.0 fps", 
-                TextStyle {
-                    font: font.clone(),
-                    color: Color::linear_rgb(0.1, 0.1, 0.1),
-                    font_size: 12.0,
-                    ..default()
-                }
+                "", 
+                style
             ),
             Label,
             DebugFrame
