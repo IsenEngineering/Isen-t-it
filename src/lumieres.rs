@@ -1,7 +1,4 @@
-use bevy::{
-    prelude::*,
-    core_pipeline::bloom::BloomSettings
-};
+use bevy::{core_pipeline::bloom::BloomSettings, prelude::*};
 use bevy_light_2d::prelude::*;
 
 pub struct PluginLumieres;
@@ -14,7 +11,7 @@ impl Plugin for PluginLumieres {
     }
     // #[cfg(target_arch = "wasm32")]
     // fn build(&self, _: &mut App) {
-    //     // On ne mets pas les lumières sur les clients web 
+    //     // On ne mets pas les lumières sur les clients web
     //     // (le jeu version web est très peu performant)
     // }
 }
@@ -42,14 +39,14 @@ fn setup(mut commands: Commands, cameras: Query<Entity, With<Camera>>) {
     }
 
     for entity in cameras.iter() {
-        // On ajoute à la caméra un effet de bloom 
+        // On ajoute à la caméra un effet de bloom
         // et une lumière ambiante faible pour pas être dans le noir.
         commands.entity(entity).insert((
             AmbientLight2d {
                 brightness: 0.1,
                 ..default()
             },
-            BloomSettings::OLD_SCHOOL
+            BloomSettings::OLD_SCHOOL,
         ));
     }
 }

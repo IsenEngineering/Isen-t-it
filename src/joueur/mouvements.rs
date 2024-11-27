@@ -1,16 +1,18 @@
-use bevy::prelude::*;
-use bevy::window::PrimaryWindow;
 use crate::joueur::Velocity;
 use crate::joueur::{PLAYER_SPEED, PLAYER_SPRINT_SPEED};
+use bevy::prelude::*;
+use bevy::window::PrimaryWindow;
 
-pub fn move_sprite_touches(touches: Res<Touches>,
+pub fn move_sprite_touches(
+    touches: Res<Touches>,
     mut sprite_position: Query<&mut Velocity, With<Sprite>>,
-    window: Query<&Window, With<PrimaryWindow>>) {
+    window: Query<&Window, With<PrimaryWindow>>,
+) {
     let mut v = sprite_position.single_mut();
     let screen = window.single();
     let height = screen.height() as f32;
     let width = screen.width() as f32;
-    
+
     for touch in touches.iter() {
         let p = touch.position();
 
@@ -32,8 +34,10 @@ pub fn move_sprite_touches(touches: Res<Touches>,
     }
 }
 
-pub fn move_sprite(keyboard: Res<ButtonInput<KeyCode>>,
-    mut sprite_position: Query<&mut Velocity, With<Sprite>>) {
+pub fn move_sprite(
+    keyboard: Res<ButtonInput<KeyCode>>,
+    mut sprite_position: Query<&mut Velocity, With<Sprite>>,
+) {
     // Il n'y a par défaut qu'un unique sprite.
     let mut v = sprite_position.single_mut();
 
@@ -41,7 +45,7 @@ pub fn move_sprite(keyboard: Res<ButtonInput<KeyCode>>,
     let norme: f32 = match keyboard.pressed(KeyCode::ShiftLeft) {
         // appuyer sur shift permet de courir plus vite
         true => PLAYER_SPRINT_SPEED,
-        false => PLAYER_SPEED
+        false => PLAYER_SPEED,
     };
 
     // On donne un mouvement sur l'axe Y
@@ -51,8 +55,8 @@ pub fn move_sprite(keyboard: Res<ButtonInput<KeyCode>>,
     }
     if keyboard.pressed(KeyCode::KeyS) {
         v.dy -= norme;
-    } 
-    
+    }
+
     // On donne un mouvement sur l'axe X
     v.dx = 0.0;
     if keyboard.pressed(KeyCode::KeyA) {

@@ -1,9 +1,6 @@
-use bevy::{
-    prelude::*,
-    diagnostic::FrameTimeDiagnosticsPlugin
-};
-use dotenv::dotenv;
+use bevy::{diagnostic::FrameTimeDiagnosticsPlugin, prelude::*};
 use bevy_editor_pls::EditorPlugin;
+use dotenv::dotenv;
 
 mod information;
 
@@ -20,7 +17,7 @@ impl Plugin for PluginPerf {
 
         let debug = match std::env::var("DEBUG") {
             Ok(v) => v,
-            _ => "false".to_string()
+            _ => "false".to_string(),
         };
 
         app.insert_resource(Debug(debug == "true"));
@@ -29,12 +26,8 @@ impl Plugin for PluginPerf {
         app.add_systems(Startup, information::setup);
         app.add_systems(Update, information::update);
         if debug == "true" {
-            app.add_plugins((
-                EditorPlugin::new(),
-                FrameTimeDiagnosticsPlugin
-            ));
+            app.add_plugins((EditorPlugin::new(), FrameTimeDiagnosticsPlugin));
         }
-
     }
 }
 

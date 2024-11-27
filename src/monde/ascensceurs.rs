@@ -16,11 +16,12 @@ impl Plugin for PluginAscenseur {
 #[derive(Component)]
 struct Ascenseur;
 
-fn setup(mut commands: Commands, 
+fn setup(
+    mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    asset_server: Res<AssetServer>) {
-
+    asset_server: Res<AssetServer>,
+) {
     // On charge l'image de l'ascenseur
     let ascenseur = asset_server.load(ASCENSEUR_PATH);
     let material = materials.add(ColorMaterial {
@@ -30,24 +31,23 @@ fn setup(mut commands: Commands,
 
     // Pour chaque étage
     for i in 0..7 {
-        commands.spawn(MaterialMesh2dBundle {
-            mesh: meshes.add(Rectangle::default()).into(),
-            material: material.clone(),
-            transform: Transform {
-                translation: Vec3::new(
-                    // 6 ème carré de la largeur et au milieu
-                    6.0 * 48.0 + 24.0, 
-                    45.0 + i as f32 * 48.0, 
-                    1.0
-                ),
-                scale: Vec3::new(36.0, 42.0, 1.0),
+        commands
+            .spawn(MaterialMesh2dBundle {
+                mesh: meshes.add(Rectangle::default()).into(),
+                material: material.clone(),
+                transform: Transform {
+                    translation: Vec3::new(
+                        // 6 ème carré de la largeur et au milieu
+                        6.0 * 48.0 + 24.0,
+                        45.0 + i as f32 * 48.0,
+                        1.0,
+                    ),
+                    scale: Vec3::new(36.0, 42.0, 1.0),
+                    ..default()
+                },
                 ..default()
-            },
-            ..default()
-        }).insert((
-            Name::from(format!("ascenseur-{}", i + 1)), 
-            Ascenseur
-        ));
+            })
+            .insert((Name::from(format!("ascenseur-{}", i + 1)), Ascenseur));
     }
 }
 

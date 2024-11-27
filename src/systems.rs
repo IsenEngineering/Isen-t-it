@@ -1,54 +1,56 @@
-use bevy::{prelude::*, window::WindowResized};
-use crate::joueur::Velocity;
 use crate::collisions::{point_in_area, CollisionArea, CollisionDisabled};
+use crate::joueur::Velocity;
+use bevy::{prelude::*, window::WindowResized};
 
 /*
-    Ce système doit appliquer la velocité si et uniquement si, 
+    Ce système doit appliquer la velocité si et uniquement si,
     cette application n'est pas hors de la zone de collision.
 
     Autrement dit, il faut que le mouvement reste à l'intérieur de la zone jouable...
     Zone jouable définit par les Composants CollisionArea
 */
 pub fn movement_system(
-	time: Res<Time>,
+    time: Res<Time>,
     collisions: Query<&CollisionArea, Without<CollisionDisabled>>,
-	mut query: Query<(&mut Transform, &Velocity), Changed<Velocity>>,
+    mut query: Query<(&mut Transform, &Velocity), Changed<Velocity>>,
 ) {
     // On parcourt toutes entités ayant le composant Transform & Velocity
-	for (mut transform, velocity) in query.iter_mut() {
-
+    for (mut transform, velocity) in query.iter_mut() {
         // Le vecteur de translation de l'entité
-		let translation: &mut Vec3 = &mut transform.translation;
+        let translation: &mut Vec3 = &mut transform.translation;
 
         // Logique de la vérification des zones de collisions
         let mut outside = false;
         // On parcourt toutes les zones de collisions
         for area in collisions.iter() {
-            // On vérifie si la nouvelle position de 
+            // On vérifie si la nouvelle position de
             // l'entitée n'est pas hors de la zone jouable
-            if !point_in_area(Vec2::from([
-                translation.x + velocity.dx * time.delta_seconds(),
-                translation.y + velocity.dy * time.delta_seconds()
-            ]), area) {
+            if !point_in_area(
+                Vec2::from([
+                    translation.x + velocity.dx * time.delta_seconds(),
+                    translation.y + velocity.dy * time.delta_seconds(),
+                ]),
+                area,
+            ) {
                 outside = true
             }
         }
         if outside {
             // Si l'entité est hors de la zone
-            // On n'applique pas la velocite, 
+            // On n'applique pas la velocite,
             // On passe à l'entité suivante
             continue;
         }
-        
-        /* time.delta_seconds() donne le temps entre l'image 
-        précedente et la nouvelle, 
 
-        utiliser * time.delta_seconds() assure que le mouvement 
-        ne diffère pas d'un appareil performant (beaucoup d'images 
+        /* time.delta_seconds() donne le temps entre l'image
+        précedente et la nouvelle,
+
+        utiliser * time.delta_seconds() assure que le mouvement
+        ne diffère pas d'un appareil performant (beaucoup d'images
         par seconde) à un appareil moins performant */
-		translation.x += velocity.dx * time.delta_seconds();
-		translation.y += velocity.dy * time.delta_seconds();
-	}
+        translation.x += velocity.dx * time.delta_seconds();
+        translation.y += velocity.dy * time.delta_seconds();
+    }
 }
 
 /* Ce système ajuste la position de la caméra
@@ -70,8 +72,8 @@ pub fn camera_follow_system(
 
     for mut cam in camera_query.iter_mut() {
         let delta: Vec3 = player.translation - cam.translation;
-    
-        // * time.delta_seconds() assure que la camera suit au 
+
+        // * time.delta_seconds() assure que la camera suit au
         // fur et à mesure le joueur et pas de façon immédiate
         // * 4.0 assure que la caméra va plus vite que le personnage
         cam.translation.x += delta.x * time.delta_seconds() * 4.0;

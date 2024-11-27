@@ -29,68 +29,59 @@ impl Plugin for Interactions {
 }
 
 fn setup(mut commands: Commands) {
-    commands.spawn((
-        // Données du point d'intéraction
-        InteractionPoint {
-            distance: 12.0,
-            max_intensity: 2.0,
-            min_intensity: 0.5,
-            intensity_variance: 5.0,
-        },
-        SpatialBundle {
-            transform: Transform::from_translation(Vec3::new(
-                260.5,
-                34.0,
-                3.0
-            )),
-            ..default()
-        },
-        PointLight2d {
-            color: Color::linear_rgb(0.5, 0.5,2.0),
-            radius: 12.0,
-            ..default()
-        }
-    )).with_children(|parent| {
-        parent.spawn(Text2dBundle {
-            text: Text::from_section("Press F to Interact", TextStyle {
-                font_size: 12.0,
-                ..default()
-            }),
-            transform: Transform {
-                translation: Vec3::new(
-                    0.0,
-                    6.0,
-                    0.0
-                ),
-                scale: Vec3::new(0.1, 0.1, 1.0),
+    commands
+        .spawn((
+            // Données du point d'intéraction
+            InteractionPoint {
+                distance: 12.0,
+                max_intensity: 2.0,
+                min_intensity: 0.5,
+                intensity_variance: 5.0,
+            },
+            SpatialBundle {
+                transform: Transform::from_translation(Vec3::new(260.5, 34.0, 3.0)),
                 ..default()
             },
-            ..default()
+            PointLight2d {
+                color: Color::linear_rgb(0.5, 0.5, 2.0),
+                radius: 12.0,
+                ..default()
+            },
+        ))
+        .with_children(|parent| {
+            parent.spawn(Text2dBundle {
+                text: Text::from_section(
+                    "Press F to Interact",
+                    TextStyle {
+                        font_size: 12.0,
+                        ..default()
+                    },
+                ),
+                transform: Transform {
+                    translation: Vec3::new(0.0, 6.0, 0.0),
+                    scale: Vec3::new(0.1, 0.1, 1.0),
+                    ..default()
+                },
+                ..default()
+            });
         });
-    });
 }
 
 fn animate_interaction(
     time: Res<Time>,
-    mut interactions_query: Query<(&mut PointLight2d, &InteractionPoint, 
-        &Transform)>,
-    player_query: Query<&Transform, (Changed<Transform>, With<Velocity>)>) {
-
+    mut interactions_query: Query<(&mut PointLight2d, &InteractionPoint, &Transform)>,
+    player_query: Query<&Transform, (Changed<Transform>, With<Velocity>)>,
+) {
     // On passe sur chaque joueur
     for player in player_query.iter() {
-
         // On passe sur chaque point de lumière
-        for (mut light, point, 
-            transform) 
-            in interactions_query.iter_mut() {
-
-            // Si le point est trop loin du joueur on ne fait rien 
+        for (mut light, point, transform) in interactions_query.iter_mut() {
+            // Si le point est trop loin du joueur on ne fait rien
             // (à l'exception de la correction d'intensité)
             if player.translation.distance(transform.translation) > point.distance {
                 if light.intensity > point.min_intensity {
                     light.intensity -= point.intensity_variance * time.delta_seconds();
                 }
-
 
                 continue;
             }
