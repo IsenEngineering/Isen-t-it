@@ -1,5 +1,4 @@
 use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
-// use crate::joueur::Velocity;
 
 // Chemin de l'image de l'ascenseur (qui fait 36x42)
 const ASCENSEUR_PATH: &str = "monde/ascenseur.png";

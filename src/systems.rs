@@ -1,5 +1,5 @@
 use crate::collisions::{point_in_area, CollisionArea, CollisionDisabled};
-use crate::joueur::Velocity;
+use crate::joueur::composants::{Velocity, JoueurPrincipal};
 use bevy::{prelude::*, window::WindowResized};
 
 /*
@@ -62,15 +62,17 @@ trop brusques.
 */
 pub fn camera_follow_system(
     time: Res<Time>,
-    player_query: Query<&Transform, With<Velocity>>,
-    mut camera_query: Query<&mut Transform, (With<Camera>, Without<Velocity>)>,
+    mut set: ParamSet<(
+        Query<&Transform, With<JoueurPrincipal>>,
+        Query<&mut Transform, With<Camera>>
+    )>,
 ) {
-    let player = match player_query.get_single() {
-        Ok(transform) => transform,
+    let player = match set.p0().get_single() {
+        Ok(transform) => transform.clone(),
         Err(_) => return,
     };
 
-    for mut cam in camera_query.iter_mut() {
+    for mut cam in set.p1().iter_mut() {
         let delta: Vec3 = player.translation - cam.translation;
 
         // * time.delta_seconds() assure que la camera suit au

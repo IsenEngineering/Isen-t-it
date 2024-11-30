@@ -1,4 +1,4 @@
-use crate::joueur::Velocity;
+use crate::joueur::composants::Velocity;
 use crate::joueur::{PLAYER_SPEED, PLAYER_SPRINT_SPEED};
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;

@@ -1,10 +1,10 @@
 use bevy::prelude::*;
 use bevy_light_2d::light::PointLight2d;
 
-use crate::joueur::Velocity;
+use crate::joueur::composants::Velocity;
 
 #[derive(Component)]
-struct InteractionPoint {
+pub struct InteractionPoint {
     // Intensité lorsque l'utilisateur peut intéragir
     max_intensity: f32,
 
@@ -19,6 +19,41 @@ struct InteractionPoint {
     distance: f32,
 }
 
+impl Default for InteractionPoint {
+    fn default() -> Self {
+        InteractionPoint {
+            max_intensity: 3.0,
+            intensity_variance: 10.0,
+            min_intensity: 0.5,
+            distance: 24.0
+        }
+    }
+}
+
+#[derive(Bundle, Default)]
+pub struct InteractionBundle {
+    // Les informations sur le point d'interaction
+    pub interaction_point: InteractionPoint,
+
+    // Le point de lumière
+    pub light_point: PointLight2d,
+
+    /// The visibility of the entity.
+    pub visibility: Visibility,
+
+    /// The inherited visibility of the entity.
+    pub inherited_visibility: InheritedVisibility,
+
+    /// The view visibility of the entity.
+    pub view_visibility: ViewVisibility,
+
+    /// The transform of the entity.
+    pub transform: Transform,
+
+    /// The global transform of the entity.
+    pub global_transform: GlobalTransform,
+}
+
 pub struct Interactions;
 
 impl Plugin for Interactions {
@@ -29,25 +64,21 @@ impl Plugin for Interactions {
 }
 
 fn setup(mut commands: Commands) {
-    commands
-        .spawn((
-            // Données du point d'intéraction
-            InteractionPoint {
-                distance: 12.0,
-                max_intensity: 2.0,
-                min_intensity: 0.5,
-                intensity_variance: 5.0,
-            },
-            SpatialBundle {
-                transform: Transform::from_translation(Vec3::new(260.5, 34.0, 3.0)),
-                ..default()
-            },
-            PointLight2d {
-                color: Color::linear_rgb(0.5, 0.5, 2.0),
-                radius: 12.0,
-                ..default()
-            },
-        ))
+    commands.spawn(InteractionBundle {
+        interaction_point: InteractionPoint {
+            distance: 12.0,
+            max_intensity: 2.0,
+            min_intensity: 0.5,
+            intensity_variance: 5.0,
+        },
+        light_point: PointLight2d {
+            color: Color::linear_rgb(0.5, 0.5, 2.0),
+            radius: 12.0,
+            ..default()
+        },
+        transform: Transform::from_translation(Vec3::new(260.5, 34.0, 3.0)),
+        ..default()
+    })
         .with_children(|parent| {
             parent.spawn(Text2dBundle {
                 text: Text::from_section(

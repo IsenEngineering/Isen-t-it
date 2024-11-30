@@ -1,5 +1,7 @@
-use crate::{joueur::Velocity, joueur::PLAYER_SPRINT_SPEED};
+use crate::{joueur::composants::Velocity, joueur::PLAYER_SPRINT_SPEED};
 use bevy::prelude::*;
+
+use super::composants::JoueurPrincipal;
 
 // Composant contenant l'état de l'animation
 #[derive(Component)]
@@ -25,7 +27,7 @@ pub fn animate_sprite(
             &mut TextureAtlas,
             &mut Sprite,
         ),
-        Changed<Velocity>,
+        (Changed<Velocity>, With<JoueurPrincipal>),
     >,
 ) {
     for (velocity, mut timer, mut texture, mut sprite) in query.iter_mut() {

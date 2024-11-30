@@ -2,6 +2,7 @@ use bevy::prelude::*;
 
 mod animation;
 mod mouvements;
+pub mod composants;
 
 /*   Constantes  */
 
@@ -12,10 +13,7 @@ pub const PLAYER_SPEED: f32 = 50.0;
 // Vitesse  d'un personnage en sprint
 pub const PLAYER_SPRINT_SPEED: f32 = 100.0;
 
-/* Plugin */
-
 pub struct Joueur;
-
 impl Plugin for Joueur {
     fn build(&self, app: &mut App) {
         // Au démarrage
@@ -31,13 +29,6 @@ impl Plugin for Joueur {
             ),
         );
     }
-}
-
-// Velocité d'une entité
-#[derive(Clone, Component)]
-pub struct Velocity {
-    pub dx: f32,
-    pub dy: f32,
 }
 
 /* Systèmes */
@@ -57,8 +48,8 @@ fn setup(
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
 
     // On spawn l'entité
-    commands.spawn((
-        SpriteBundle {
+    commands.spawn(composants::BundleJoueur {
+        sprite: SpriteBundle {
             texture,
             transform: Transform {
                 // z: 2 pour que le joueur soit au dessus du fond
@@ -70,16 +61,10 @@ fn setup(
             },
             ..default()
         },
-        // On lui donne une velocité,
-        // sa position est alors mise à jours.
-        Velocity { dx: 0.0, dy: 0.0 },
-        // L'utilitaire qui gères l'image de l'animation affichée
-        TextureAtlas {
+        texture: TextureAtlas {
             layout: texture_atlas_layout,
             index: 0,
         },
-        // On ajoute un composant contenant l'état
-        // de l'animation (basiquement le temps entre chaque image).
-        animation::AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
-    ));
+        ..default()
+    });
 }
