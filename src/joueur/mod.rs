@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use composants::{JoueurPrincipal, Velocity};
 
 mod animation;
 mod mouvements;
@@ -48,23 +49,27 @@ fn setup(
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
 
     // On spawn l'entité
-    commands.spawn(composants::BundleJoueur {
-        sprite: SpriteBundle {
-            texture,
-            transform: Transform {
-                // z: 2 pour que le joueur soit au dessus du fond
-
-                // On la dépose au centre
-                translation: Vec3::new(24., 24., 2.),
-                scale: Vec3::new(1., 1., 1.),
-                ..default()
-            },
+    commands.spawn((
+        Sprite {
+            image: texture,
+            texture_atlas: Some(TextureAtlas {
+                layout: texture_atlas_layout,
+                index: 0,
+            }),
             ..default()
         },
-        texture: TextureAtlas {
-            layout: texture_atlas_layout,
-            index: 0,
+        Transform {
+            // z: 2 pour que le joueur soit au dessus du fond
+
+            // On la dépose au centre
+            translation: Vec3::new(24., 24., 2.),
+            scale: Vec3::new(1., 1., 1.),
+            ..default()
         },
-        ..default()
-    });
+        JoueurPrincipal,
+        Velocity::default(),
+        animation::AnimationTimer(
+            Timer::from_seconds(0.1, TimerMode::Repeating)
+        ),
+    ));
 }

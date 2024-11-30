@@ -1,5 +1,5 @@
 use bevy::{diagnostic::FrameTimeDiagnosticsPlugin, prelude::*};
-use bevy_editor_pls::EditorPlugin;
+// use bevy_editor_pls::EditorPlugin;
 use dotenv::dotenv;
 
 mod information;
@@ -26,7 +26,9 @@ impl Plugin for PluginPerf {
         app.add_systems(Startup, information::setup);
         app.add_systems(Update, information::update);
         if debug == "true" {
-            app.add_plugins((EditorPlugin::new(), FrameTimeDiagnosticsPlugin));
+            app.add_plugins(FrameTimeDiagnosticsPlugin);
+            // Le plugin bevy_pls_editor n'est pas compatible avec la 0.15 de bevy
+            // EditorPlugin::new() 
         }
     }
 }

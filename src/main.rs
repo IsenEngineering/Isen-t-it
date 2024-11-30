@@ -1,8 +1,7 @@
-use bevy::{color::palettes::css::WHITE, prelude::*};
+use bevy::{color::palettes::css::BLACK, prelude::*};
 
 mod collisions;
 mod debug;
-mod interactions;
 mod joueur;
 mod lumieres;
 mod monde;
@@ -20,7 +19,7 @@ fn main() {
                 // Ce "sampler" donne un look pixelisé au jeu,
                 // Vous pouvez essayer dd supprimer cette ligne,
                 // toutes les images deviennent floues
-                default_sampler: bevy::render::texture::ImageSamplerDescriptor::nearest(),
+                default_sampler: bevy::image::ImageSamplerDescriptor::nearest(),
             })
             .set(WindowPlugin {
                 primary_window: Some(Window {
@@ -37,7 +36,6 @@ fn main() {
         debug::PluginPerf,
         collisions::PluginCollisions,
         lumieres::PluginLumieres,
-        interactions::Interactions,
     ));
 
     // Au démarrage
@@ -56,18 +54,18 @@ fn main() {
 }
 
 fn setup(mut commands: Commands) {
-    // On mets une camera, autrement on pourrait pas voir ce qu'il se passe...
-    let mut camera: Camera2dBundle = Camera2dBundle::default();
-
-    // La technologie HDR permet d'améliorer les lumières
-    // On va "saturer" les couleurs (en bref)
-    camera.camera.hdr = true;
-
-    // Fond blanc
-    camera.camera.clear_color = ClearColorConfig::Custom(WHITE.into());
-
-    // On centre l'axe y de la camera sur le premier étage
-    camera.transform.translation.y = 36.0;
-
-    commands.spawn((camera, IsDefaultUiCamera));
+    commands.spawn((
+        // // On mets une camera, autrement on pourrait pas voir ce qu'il se passe...
+        Camera2d, 
+        Camera {
+            // // La technologie HDR permet d'améliorer les lumières
+            // // On va "saturer" les couleurs (en bref)
+            hdr: true,
+            // // Fond blanc
+            clear_color: ClearColorConfig::Custom(BLACK.into()),
+            ..default()
+        },
+        // // On centre l'axe y de la camera sur le premier étage
+        Transform::from_translation(Vec3::new(0.0, 36.0, 0.0))
+    ));
 }

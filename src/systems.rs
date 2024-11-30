@@ -27,8 +27,8 @@ pub fn movement_system(
             // l'entitée n'est pas hors de la zone jouable
             if !point_in_area(
                 Vec2::from([
-                    translation.x + velocity.dx * time.delta_seconds(),
-                    translation.y + velocity.dy * time.delta_seconds(),
+                    translation.x + velocity.dx * time.delta_secs(),
+                    translation.y + velocity.dy * time.delta_secs(),
                 ]),
                 area,
             ) {
@@ -48,8 +48,8 @@ pub fn movement_system(
         utiliser * time.delta_seconds() assure que le mouvement
         ne diffère pas d'un appareil performant (beaucoup d'images
         par seconde) à un appareil moins performant */
-        translation.x += velocity.dx * time.delta_seconds();
-        translation.y += velocity.dy * time.delta_seconds();
+        translation.x += velocity.dx * time.delta_secs();
+        translation.y += velocity.dy * time.delta_secs();
     }
 }
 
@@ -78,7 +78,7 @@ pub fn camera_follow_system(
         // * time.delta_seconds() assure que la camera suit au
         // fur et à mesure le joueur et pas de façon immédiate
         // * 4.0 assure que la caméra va plus vite que le personnage
-        cam.translation.x += delta.x * time.delta_seconds() * 4.0;
+        cam.translation.x += delta.x * time.delta_secs() * 4.0;
     }
 }
 

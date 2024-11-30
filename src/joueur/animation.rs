@@ -24,13 +24,12 @@ pub fn animate_sprite(
         (
             &Velocity,
             &mut AnimationTimer,
-            &mut TextureAtlas,
             &mut Sprite,
         ),
         (Changed<Velocity>, With<JoueurPrincipal>),
     >,
 ) {
-    for (velocity, mut timer, mut texture, mut sprite) in query.iter_mut() {
+    for (velocity, mut timer, mut sprite) in query.iter_mut() {
         // On mets à jour l'état de l'animation
         timer.0.tick(time.delta());
 
@@ -47,6 +46,11 @@ pub fn animate_sprite(
             // Notez que flip_x est un boolean,
             // on assigne bien une condition <=> un boolean
         }
+
+        let texture = match &mut sprite.texture_atlas {
+            Some(v) => v,
+            _ => return
+        };
 
         // Dans le cas où l'entité bouge, on l'anime.
         if is_moving && timer.0.finished() {

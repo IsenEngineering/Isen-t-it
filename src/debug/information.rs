@@ -11,7 +11,7 @@ pub fn update(mut text: Query<&mut Text, With<DebugFrame>>, diagnostics: Res<Dia
     };
 
     for mut t in text.iter_mut() {
-        t.sections[0].value = format!("{:.1} FPS", fps.smoothed().unwrap_or(0.0));
+        t.0 = format!("{:.1} FPS", fps.smoothed().unwrap_or(0.0));
     }
 }
 
@@ -21,31 +21,38 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 
     // root node
     commands
-        .spawn(NodeBundle {
-            style: Style {
-                display: Display::Flex,
-                flex_direction: FlexDirection::Column,
-                align_items: AlignItems::End,
+        .spawn(Node {
+            display: Display::Flex,
+            flex_direction: FlexDirection::Column,
+            align_items: AlignItems::End,
 
-                position_type: PositionType::Absolute,
-                margin: UiRect::all(Val::Px(25.)),
-                bottom: Val::Px(0.),
-                right: Val::Px(0.),
-                ..default()
-            },
+            position_type: PositionType::Absolute,
+            margin: UiRect::all(Val::Px(25.)),
+            bottom: Val::Px(0.),
+            right: Val::Px(0.),
+
             ..default()
         })
         .with_children(|parent| {
-            let style = TextStyle {
-                font: font.clone(),
-                color: Color::linear_rgb(0.1, 0.1, 0.1),
-                font_size: 12.0,
-                ..default()
-            };
+            let text = format!("Isen't It - {}", VERSION);
             parent.spawn((
-                TextBundle::from_section(format!("Isen't It - {}", VERSION), style.clone()),
-                Label,
+                Text(text),
+                TextColor(Color::linear_rgb(0.1, 0.1, 0.1)),
+                TextFont {
+                    font: font.clone(),
+                    font_size: 12.0,
+                    ..default()
+                },
             ));
-            parent.spawn((TextBundle::from_section("", style), Label, DebugFrame));
+            parent.spawn((
+                Text("".to_string()),
+                TextColor(Color::linear_rgb(0.1, 0.1, 0.1)),
+                TextFont {
+                    font: font.clone(),
+                    font_size: 12.0,
+                    ..default()
+                },
+                DebugFrame,
+            ));
         });
 }
