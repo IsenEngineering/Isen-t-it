@@ -8,10 +8,10 @@ pub const TRANSPORT_LANES: [LaneKind; 2] = [
 ];
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct OutgoingUpdate {
+pub struct UpdateToServer {
     pub position: Vec3,
     pub skin: u8
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct IncommingUpdate(pub HashMap<String, OutgoingUpdate>);
+pub struct ServerToClient(pub HashMap<String, UpdateToServer>);

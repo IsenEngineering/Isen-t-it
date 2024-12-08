@@ -2,7 +2,7 @@ use aeronet::transport::lane::LaneIndex;
 use aeronet::{io::Session, transport::Transport};
 use bevy::{prelude::*, utils::Instant};
 use isent_it::joueur::composants::JoueurPrincipal;
-use isent_it::network::OutgoingUpdate;
+use isent_it::network::UpdateToServer;
 
 pub fn send(
     mut transports: Query<&mut Transport, With<Session>>,
@@ -17,7 +17,7 @@ pub fn send(
         _ => return
     };
 
-    let update = OutgoingUpdate {
+    let update = UpdateToServer {
         position: position.translation,
         skin: 0
     };

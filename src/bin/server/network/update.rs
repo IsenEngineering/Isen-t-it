@@ -1,7 +1,7 @@
 use aeronet::transport::Transport;
 use bevy::prelude::*;
 use bincode;
-use isent_it::network::OutgoingUpdate;
+use isent_it::network::UpdateToServer;
 
 pub fn recv(
     mut transports: Query<&mut Transport>
@@ -10,7 +10,7 @@ pub fn recv(
         for packet in transport.recv.msgs.drain() {
             info!("incomming packet: {:?}", packet);
 
-            let update = match bincode::deserialize::<OutgoingUpdate>(
+            let update = match bincode::deserialize::<UpdateToServer>(
                 packet.payload.as_slice()) {
                 Ok(u) => u,
                 Err(e) => {
