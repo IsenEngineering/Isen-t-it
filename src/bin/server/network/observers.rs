@@ -1,6 +1,6 @@
-use aeronet::io::{connection::{DisconnectReason, Disconnected, LocalAddr}, server::Server, Session};
+use aeronet::{io::{connection::{DisconnectReason, Disconnected, LocalAddr}, server::Server, Session}, transport::Transport};
 use aeronet_webtransport::server::{SessionRequest, SessionResponse};
-use bevy::prelude::*;
+use bevy::{prelude::*, utils::Instant};
 
 pub fn on_opened(trigger: Trigger<OnAdd, Server>, servers: Query<&LocalAddr>) {
     let server = trigger.entity();
@@ -27,11 +27,28 @@ pub fn on_session_request(
     request.respond(SessionResponse::Accepted);
 }
 
-pub fn on_connected(trigger: Trigger<OnAdd, Session>, clients: Query<&Parent>) {
+use isent_it::network::TRANSPORT_LANES;
+pub fn on_connected(
+    trigger: Trigger<OnAdd, Session>, 
+    clients: Query<&Parent>,
+    mut commands: Commands,
+    sessions: Query<&Session>) {
     let client = trigger.entity();
     let Ok(server) = clients.get(client).map(Parent::get) else {
         return;
     };
+
+    let session = sessions.get(client)
+        .expect("Should be connected");
+
+    let transport = Transport::new(
+        session, 
+        TRANSPORT_LANES, 
+        TRANSPORT_LANES, 
+        Instant::now()
+    ).unwrap();
+
+    commands.entity(client).insert(transport);
 
     info!("{client} connecté à {server}");
 }

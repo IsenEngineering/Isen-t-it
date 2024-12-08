@@ -1,5 +1,5 @@
-use aeronet::io::{connection::{DisconnectReason, Disconnected}, Session, SessionEndpoint};
-use bevy::prelude::*;
+use aeronet::{io::{connection::{DisconnectReason, Disconnected}, Session, SessionEndpoint}, transport::Transport};
+use bevy::{prelude::*, utils::Instant};
 
 pub fn on_connecting(
     trigger: Trigger<OnAdd, SessionEndpoint>,
@@ -13,14 +13,30 @@ pub fn on_connecting(
     info!("{name} connecting");
 }
 
+use isent_it::network::TRANSPORT_LANES;
 pub fn on_connected(
     trigger: Trigger<OnAdd, Session>,
     names: Query<&Name>,
+    mut commands: Commands,
+    sessions: Query<&Session>
 ) {
     let entity = trigger.entity();
     let name = names
         .get(entity)
         .expect("our session entity should have a name");
+
+    let session = sessions.get(entity)
+        .expect("should be connected");
+
+    let transport = Transport::new(
+        session, 
+        TRANSPORT_LANES, 
+        TRANSPORT_LANES, 
+        Instant::now()
+    ).unwrap();
+
+    commands.entity(entity).insert(transport);
+
     info!("{name} connected");
 }
 

@@ -1,17 +1,25 @@
+use aeronet::transport::AeronetTransportPlugin;
 use bevy::prelude::*;
 use aeronet_webtransport::{
-    cert::hash_to_b64, server::WebTransportServer, wtransport::Identity
+    cert::hash_to_b64, server::{WebTransportServer, WebTransportServerPlugin}, wtransport::Identity
 };
 use std::fs::write;
 
 mod config;
 mod observers;
+mod update;
 
 pub struct Reseau;
 
 impl Plugin for Reseau {
     fn build(&self, app: &mut App) {
+        app.add_plugins((
+            WebTransportServerPlugin,
+            AeronetTransportPlugin
+        ));
         app.add_systems(PreStartup, listen);
+
+        app.add_systems(PreUpdate, update::recv);
 
         app
             .add_observer(observers::on_connected)
