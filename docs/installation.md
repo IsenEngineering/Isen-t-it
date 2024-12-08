@@ -41,7 +41,7 @@
 *Construction du binaire pour la version web*
 (il faudra faire `cargo install -f wasm-bindgen-cli`)
 `cargo build --release --target wasm32-unknown-unknown`
-et `wasm-bindgen --out-dir ./web/js --target web ./target/wasm32-unknown-unknown/release/isent_it.wasm`
+et `wasm-bindgen --out-dir ./web/js --target web ./target/wasm32-unknown-unknown/release/client.wasm`
 
 *Ajout d'une librairie externe / dépendance*
 `cargo add [votre librairie]`
