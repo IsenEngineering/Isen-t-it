@@ -1,7 +1,7 @@
 use aeronet::transport::{AeronetTransportPlugin, TransportSet};
 use bevy::prelude::*;
 use aeronet_webtransport::{
-    cert::hash_to_b64, server::{WebTransportServer, WebTransportServerPlugin}, wtransport::Identity
+    cert::hash_to_b64, server::{WebTransportServer, WebTransportServerPlugin}
 };
 use update::ServerNetworkSet;
 use std::fs::write;
@@ -56,13 +56,7 @@ impl Plugin for Reseau {
 }
 
 fn listen(mut commands: Commands) {
-    let identity = Identity::self_signed(
-        [
-            "localhost", 
-            "127.0.0.1", 
-            "::1"
-        ]
-    ).expect("all given SANs should be valid DNS names");
+    let identity = config::identity();
 
     let cert = &identity.certificate_chain().as_slice()[0];
     let cert_hash = hash_to_b64(cert.hash());

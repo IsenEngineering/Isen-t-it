@@ -2954,6 +2954,7 @@ dependencies = [
  "bevy",
  "bincode",
  "dotenv",
+ "pem",
  "rand",
  "serde",
 ]

@@ -1,0 +1,18 @@
+FROM rust:latest AS rs
+WORKDIR /app
+
+COPY . .
+
+ENV CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER=aarch64-linux-gnu-gcc
+ENV CC=aarch64-linux-gnu-gcc
+
+RUN rustup target add aarch64-unknown-linux-musl
+RUN cargo build --release --target aarch64-unknown-linux-musl --bin server
+
+FROM alpine:latest AS prod
+WORKDIR /app
+
+COPY --from=rs /app/target/aarch64-unknown-linux-musl/release/server /bin/server
+
+EXPOSE 25565
+CMD [ "/bin/server" ]
