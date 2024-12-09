@@ -1,7 +1,8 @@
-use aeronet::transport::AeronetTransportPlugin;
+use aeronet::transport::{AeronetTransportPlugin, TransportSet};
 use aeronet_webtransport::client::{WebTransportClient, WebTransportClientPlugin};
 use bevy::prelude::*;
 use rand::random;
+use update::ClientNetworkSet;
 
 mod config;
 mod observers;
@@ -16,9 +17,30 @@ impl Plugin for Client {
             AeronetTransportPlugin
         ));
 
+        app.configure_sets(
+                PreUpdate, 
+                (
+                    TransportSet::Poll,
+                    ClientNetworkSet::Recv,
+                ).chain()
+            )
+            .configure_sets(
+                PostUpdate, 
+                (
+                    ClientNetworkSet::Send,
+                    TransportSet::Flush,
+                ).chain()
+            );
+
         app.add_systems(PreStartup, connect);
-        app.add_systems(PreUpdate, update::recv);
-        app.add_systems(PostUpdate, update::send);
+        app.add_systems(
+            PreUpdate, 
+            update::recv.in_set(ClientNetworkSet::Recv)
+        );
+        app.add_systems(
+            PostUpdate, 
+            update::send.in_set(ClientNetworkSet::Send)
+        );
 
         app
             .add_observer(observers::on_connected)

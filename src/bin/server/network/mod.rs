@@ -1,8 +1,9 @@
-use aeronet::transport::AeronetTransportPlugin;
+use aeronet::transport::{AeronetTransportPlugin, TransportSet};
 use bevy::prelude::*;
 use aeronet_webtransport::{
     cert::hash_to_b64, server::{WebTransportServer, WebTransportServerPlugin}, wtransport::Identity
 };
+use update::ServerNetworkSet;
 use std::fs::write;
 
 mod config;
@@ -19,11 +20,32 @@ impl Plugin for Reseau {
         ));
         app.add_systems(PreStartup, listen);
 
-        app.add_systems(PreUpdate, update::recv);
-        app.add_systems(PostUpdate, (
-            update::send_changes,
-            update::send_connections
-        ));
+        app.configure_sets(
+            PreUpdate, 
+            (
+                TransportSet::Poll,
+                ServerNetworkSet::Recv,
+            ).chain()
+        )
+        .configure_sets(
+            PostUpdate, 
+            (
+                ServerNetworkSet::Send,
+                TransportSet::Flush,
+            ).chain()
+        );
+
+        app.add_systems(
+            PreUpdate, 
+            update::recv.in_set(ServerNetworkSet::Recv)
+        );
+        app.add_systems(
+            PostUpdate, 
+            (
+                update::send_changes,
+                update::send_connections
+            ).in_set(ServerNetworkSet::Send)
+        );
 
         app
             .add_observer(observers::on_connected)

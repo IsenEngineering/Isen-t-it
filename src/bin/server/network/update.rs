@@ -3,6 +3,12 @@ use bevy::{prelude::*, utils::{hashbrown::HashMap, Instant}};
 use bincode;
 use isent_it::network::{ClientToServer, ClientsConnection, Player, ServerToClient};
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
+pub enum ServerNetworkSet {
+    Send,
+    Recv
+}
+
 // Gères les messages entrants
 pub fn recv(
     mut commands: Commands,
@@ -15,7 +21,7 @@ pub fn recv(
         let mut updates: Vec<ClientToServer> = Vec::new();
 
         // Les différents messages récupérés
-        for packet in transport.recv.msgs.drain() {
+        'packets: for packet in transport.recv.msgs.drain() {
 
             // Chaque ligne d'envoie corresponds à une action 
             // pour éviter des erreurs de "decompositions"
@@ -28,7 +34,7 @@ pub fn recv(
                             "{} a essayé de se présenter mais l'est déjà!", 
                             entity.to_bits().to_string()
                         );
-                        continue;
+                        continue 'packets;
                     } 
 
                     // On décompose les "Bytes" en données utilisable
@@ -39,7 +45,7 @@ pub fn recv(
                         // Erreur
                         Err(e) => {
                             warn!("'Player' indecomposable: {e}");
-                            continue
+                            continue 'packets
                         }
                     };
 
@@ -53,7 +59,7 @@ pub fn recv(
                         Ok(u) => u,
                         Err(e) => {
                             warn!("'ClientToServer' indecomposable: {e}");
-                            continue
+                            continue 'packets
                         }
                     };
         

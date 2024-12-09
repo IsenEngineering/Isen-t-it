@@ -5,6 +5,12 @@ use isent_it::joueur::composants::{Joueur, JoueurPrincipal};
 use isent_it::joueur::spawn_player;
 use isent_it::network::{ClientDeconnection, ClientToServer, ClientsConnection, ServerToClient};
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
+pub enum ClientNetworkSet {
+    Send,
+    Recv
+}
+
 // On envoie nos mouvements
 pub fn send(
     mut transports: Query<&mut Transport>,
@@ -37,7 +43,7 @@ pub fn recv(
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
     for mut transport in transports.iter_mut() {
-        for packet in transport.recv.msgs.drain() {
+        'packets: for packet in transport.recv.msgs.drain() {
             match packet.lane {
                 // Lorsqu'un nouveau joueur se connecte
                 LaneIndex(0) => {
@@ -46,7 +52,7 @@ pub fn recv(
                         Ok(p) => p,
                         Err(e) => {
                             warn!("can't deserialise ClientsConnection: {e}");
-                            continue;
+                            continue 'packets;
                         }
                     };
 
@@ -69,15 +75,15 @@ pub fn recv(
                         Ok(p) => p,
                         Err(e) => {
                             warn!("can't deserialise Vec3: {e}");
-                            continue;
+                            continue 'packets;
                         }
                     };
 
-                    for (mut player, name, _) in players.iter_mut() {
+                    'players_position: for (mut player, name, _) in players.iter_mut() {
                         // Si l'utilisateur est dans le tableau des modifications
                         // On modifie sa position
                         if !positions.contains_key(name.as_str()) {
-                            continue;
+                            continue 'players_position;
                         }
         
                         let position = positions.remove(name.as_str()).unwrap();
@@ -90,7 +96,7 @@ pub fn recv(
                         Ok(d) => d,
                         Err(e) => {
                             warn!("can't deserialise String: {e}");
-                            continue;
+                            continue 'packets;
                         }
                     };
 
@@ -108,9 +114,7 @@ pub fn recv(
             }
         }
     
-        for ack in transport.recv.acks.drain() {
-            debug!("{:?}", ack);
-        }
+        for _ in transport.recv.acks.drain() {}
     }
     
 }
