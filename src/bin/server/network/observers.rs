@@ -2,6 +2,7 @@ use aeronet::{io::{connection::{DisconnectReason, Disconnected, LocalAddr}, serv
 use aeronet_webtransport::server::{SessionRequest, SessionResponse};
 use bevy::{prelude::*, utils::{hashbrown::HashMap, Instant}};
 
+// Lorsque le serveur s'ouvre
 pub fn on_opened(trigger: Trigger<OnAdd, Server>, servers: Query<&LocalAddr>) {
     let server = trigger.entity();
     let local_addr = servers.get(server)
@@ -9,6 +10,7 @@ pub fn on_opened(trigger: Trigger<OnAdd, Server>, servers: Query<&LocalAddr>) {
     info!("{server} ouvert sur {}", **local_addr);
 }
 
+// Lorsqu'un client demande à se connecter
 pub fn on_session_request(
     mut trigger: Trigger<SessionRequest>,
     clients: Query<&Parent>,
@@ -19,7 +21,7 @@ pub fn on_session_request(
         return;
     };
 
-    info!("{client} connecting to {server} with headers:");
+    info!("{client} se connecte à {server}:");
     for (header_key, header_value) in &request.headers {
         info!("  {header_key}: {header_value}");
     }
@@ -28,6 +30,7 @@ pub fn on_session_request(
 }
 
 use isent_it::network::{ClientsConnection, Player, TRANSPORT_LANES};
+// Lorsqu'un client est parvenu à se connecter
 pub fn on_connected(
     trigger: Trigger<OnAdd, Session>, 
     mut commands: Commands,
@@ -38,6 +41,9 @@ pub fn on_connected(
     let session = sessions.get(client)
         .expect("Should be connected");
 
+    // On ajoute le composant Transport pour pouvoir fragmenter 
+    // les messages en packet et les reconstruirent.
+    // Pour envoyer des données de plusieurs types et de tailles très variées
     let mut transport = Transport::new(
         session, 
         TRANSPORT_LANES, 
@@ -45,8 +51,10 @@ pub fn on_connected(
         Instant::now()
     ).unwrap();
 
+    // On lui envoie les joueurs déjà connectés
     let mut connected: ClientsConnection = HashMap::new();
     for (player, entity) in players.iter() {
+        // L'identifiant des joueurs connectés 
         let name = entity.to_bits().to_string();
         connected.insert(
             name, 
@@ -65,6 +73,7 @@ pub fn on_connected(
     info!("{client} connecté");
 }
 
+// Lorsqu'un client s'est déconnecté
 pub fn on_disconnected(
     trigger: Trigger<Disconnected>, 
     clients: Query<&Parent>,
@@ -86,6 +95,7 @@ pub fn on_disconnected(
         }
     }
 
+    // On prévient les autres clients que ce client s'est déconnecté
     let id = client.to_bits().to_string();
     for mut transport in transports.iter_mut() {
         transport.send.push(

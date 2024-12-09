@@ -1,6 +1,7 @@
 use aeronet::{io::{connection::{DisconnectReason, Disconnected}, Session, SessionEndpoint}, transport::{lane::LaneIndex, Transport}};
 use bevy::{prelude::*, utils::Instant};
 
+// Lorsque l'utilisateur se connecte
 pub fn on_connecting(
     trigger: Trigger<OnAdd, SessionEndpoint>,
     names: Query<&Name>,
@@ -15,6 +16,8 @@ pub fn on_connecting(
 
 use isent_it::{joueur::{composants::{JoueurPrincipal, Velocity}, spawn_player, animation::AnimationTimer}, network::{Player, TRANSPORT_LANES}};
 use rand::random;
+
+// Lorsqu'il parvient à se connecter
 pub fn on_connected(
     trigger: Trigger<OnAdd, Session>,
     names: Query<&Name>,
@@ -31,6 +34,9 @@ pub fn on_connected(
     let session = sessions.get(entity)
         .expect("should be connected");
 
+    // On ajoute le composant Transport pour pouvoir fragmenter 
+    // les messages en packet et les reconstruirent.
+    // Pour envoyer des données de plusieurs types et de tailles très variées
     let mut transport = Transport::new(
         session, 
         TRANSPORT_LANES, 
@@ -38,11 +44,13 @@ pub fn on_connected(
         Instant::now()
     ).unwrap();
 
+    // Les données partagés avec le serveur
     let player = Player {
         position: Vec3::new(24., 24., 2.),
         skin: random::<u8>()
     };
 
+    // L'instance du joueur côté client
     let joueur_principal = spawn_player(
         &mut commands, 
         &asset_server, 
@@ -59,6 +67,7 @@ pub fn on_connected(
         )
     ));
 
+    // On se présente au serveur
     transport.send.push(
         LaneIndex(0), 
         bincode::serialize(&player).unwrap().into(), 
@@ -70,6 +79,7 @@ pub fn on_connected(
     info!("{name} connected");
 }
 
+// Lorsqu'on se déconnecte.
 pub fn on_disconnected(
     trigger: Trigger<Disconnected>,
     names: Query<&Name>,

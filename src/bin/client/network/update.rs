@@ -5,6 +5,7 @@ use isent_it::joueur::composants::{Joueur, JoueurPrincipal};
 use isent_it::joueur::spawn_player;
 use isent_it::network::{ClientDeconnection, ClientToServer, ClientsConnection, ServerToClient};
 
+// On envoie nos mouvements
 pub fn send(
     mut transports: Query<&mut Transport>,
     positions: Query<&Transform, (With<JoueurPrincipal>, Changed<Transform>)>
@@ -15,17 +16,19 @@ pub fn send(
             _ => return
         };
     
+        // On prends la position qui a changé
         let update: ClientToServer = position.translation;
     
+        // On l'envoie sur une ligne UDP
         transport.send.push(
             LaneIndex(1), 
             bincode::serialize(&update).unwrap().into(),
             Instant::now()
         );
-        info!("position sent on lane 1");
     }
 }
 
+// Récéption des messages du serveur
 pub fn recv(
     mut commands: Commands,
     mut players: Query<(&mut Transform, &Name, Entity), With<Joueur>>,
@@ -36,9 +39,9 @@ pub fn recv(
     for mut transport in transports.iter_mut() {
         for packet in transport.recv.msgs.drain() {
             match packet.lane {
-                // A player connects
+                // Lorsqu'un nouveau joueur se connecte
                 LaneIndex(0) => {
-                    let connections = match bincode::deserialize::<ClientsConnection>(
+                    let connections: bevy::utils::hashbrown::HashMap<String, isent_it::network::Player> = match bincode::deserialize::<ClientsConnection>(
                         &packet.payload) {
                         Ok(p) => p,
                         Err(e) => {
@@ -47,6 +50,7 @@ pub fn recv(
                         }
                     };
 
+                    // On instancie les joueurs
                     for (name, player) in connections.iter() {
                         let player = spawn_player(
                             &mut commands, 
@@ -59,7 +63,7 @@ pub fn recv(
                         commands.entity(player).insert(Name::new(name.to_string()));
                     }
                 },
-                // Other players' position updates
+                // Lorsque des autres joueurs se déplacent
                 LaneIndex(2) => {
                     let mut positions = match bincode::deserialize::<ServerToClient>(&packet.payload) {
                         Ok(p) => p,
@@ -70,6 +74,8 @@ pub fn recv(
                     };
 
                     for (mut player, name, _) in players.iter_mut() {
+                        // Si l'utilisateur est dans le tableau des modifications
+                        // On modifie sa position
                         if !positions.contains_key(name.as_str()) {
                             continue;
                         }
@@ -78,7 +84,7 @@ pub fn recv(
                         player.translation = position;
                     }
                 },
-                // Other players' deconnection
+                // Lorsque d'autres joueurs se deconnectent 
                 LaneIndex(3) => {
                     let player = match bincode::deserialize::<ClientDeconnection>(&packet.payload) {
                         Ok(d) => d,
@@ -88,12 +94,14 @@ pub fn recv(
                         }
                     };
 
+                    // On supprime les joueurs en question
                     for (_, name, entity) in players.iter_mut() {
                         if player.eq(name.as_str()) {
                             commands.entity(entity).despawn();
                         }
                     }
                 },
+                // On n'attends aucun autre message.
                 _ => {
                     warn!("Un message s'est perdu! {:?}", packet);
                 }
