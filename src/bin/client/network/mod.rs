@@ -1,4 +1,4 @@
-use aeronet::transport::{AeronetTransportPlugin, TransportSet};
+use aeronet::transport::AeronetTransportPlugin;
 use aeronet_webtransport::client::{WebTransportClient, WebTransportClientPlugin};
 use bevy::prelude::*;
 use rand::random;

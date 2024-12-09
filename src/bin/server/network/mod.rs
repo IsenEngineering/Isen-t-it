@@ -20,6 +20,10 @@ impl Plugin for Reseau {
         app.add_systems(PreStartup, listen);
 
         app.add_systems(PreUpdate, update::recv);
+        app.add_systems(PostUpdate, (
+            update::send_changes,
+            update::send_connections
+        ));
 
         app
             .add_observer(observers::on_connected)

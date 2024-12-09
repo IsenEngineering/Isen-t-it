@@ -35,7 +35,7 @@ fn main() {
                 }),
                 ..default()
             }),
-        joueur::Joueur,
+        joueur::PluginJoueur,
         monde::Monde,
         debug::PluginPerf,
         collisions::PluginCollisions,

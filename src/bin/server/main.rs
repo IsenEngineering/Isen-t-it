@@ -10,6 +10,7 @@ fn main() {
         MinimalPlugins,
         LogPlugin::default(),
         network::Reseau,
+        TransformPlugin
     ));
     app.run();
 }
