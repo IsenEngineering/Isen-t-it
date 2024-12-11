@@ -1,13 +1,14 @@
-FROM rust:latest AS rs
+FROM rust:alpine AS rs
 WORKDIR /app
 
 COPY . .
 
-RUN rustup target add wasm32-unknown-unknown && cargo install -f wasm-bindgen-cli
+RUN rustup target add wasm32-unknown-unknown && cargo install -f wasm-bindgen-cli --version 0.2.97
 
-RUN cargo build --release --bin client --target wasm32-unknown-unknown && wasm-bindgen --out-dir ./out --target web ./target/wasm32-unknown-unknown/release/client.wasm
+RUN cargo build --release --bin client --target wasm32-unknown-unknown \
+    && wasm-bindgen --out-dir ./out --target web ./target/wasm32-unknown-unknown/release/client.wasm
 
-FROM rust:latest AS rss
+FROM rust:alpine AS rss
 WORKDIR /app
 
 RUN git clone https://github.com/Loshido/rust_static_server /app

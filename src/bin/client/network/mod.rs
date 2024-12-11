@@ -50,7 +50,8 @@ impl Plugin for Client {
     }
 }
 
-const DEFAULT_TARGET: &str = "https://[::1]:25565";
+// `TARGET_URL="https://[::1]:25565" cargo ...` to run on localhost
+const DEFAULT_TARGET: &str = "https://isent_it.aruni.space:25565";
 const CERT_HASH: &str = include_str!("../../../../.keys/hash");
 
 fn connect(mut commands: Commands) {

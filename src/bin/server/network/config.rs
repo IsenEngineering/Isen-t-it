@@ -41,13 +41,14 @@ pub fn identity() -> Identity {
 
 const DEFAULT_PORT: u16 = 25565;
 pub fn server_config(identity: &Identity) -> ServerConfig {
+    use aeronet_webtransport::wtransport::config::IpBindConfig::InAddrAnyV4;
     let port = match var("PORT") {
         Ok(s) => s.parse::<u16>().unwrap_or(DEFAULT_PORT),
         _ => DEFAULT_PORT
     };
 
     ServerConfig::builder()
-        .with_bind_default(port)
+        .with_bind_config(InAddrAnyV4, port)
         .with_identity(identity)
         .keep_alive_interval(Some(Duration::from_secs(1)))
         .max_idle_timeout(Some(Duration::from_secs(5)))
