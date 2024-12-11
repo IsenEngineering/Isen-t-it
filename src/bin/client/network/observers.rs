@@ -46,7 +46,7 @@ pub fn on_connected(
 
     // Les données partagés avec le serveur
     let player = Player {
-        position: Vec3::new(24., 24., 2.),
+        position: Vec3::new(24., 24., 15.),
         skin: random::<u8>()
     };
 
@@ -82,8 +82,14 @@ pub fn on_connected(
 // Lorsqu'on se déconnecte.
 pub fn on_disconnected(
     trigger: Trigger<Disconnected>,
+    local_players: Query<Entity, With<JoueurPrincipal>>,
+    mut commands: Commands,
     names: Query<&Name>,
 ) {
+    for local_player in local_players.iter() {
+        commands.entity(local_player).despawn();
+    }
+
     let entity = trigger.entity();
     let Disconnected { reason } = trigger.event();
     let name = names

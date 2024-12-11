@@ -48,6 +48,17 @@ pub fn movement_system(
         par seconde) à un appareil moins performant */
         transform.translation.x += velocity.dx * time.delta_secs();
         transform.translation.y += velocity.dy * time.delta_secs();
+
+        // La troisième dimension permet de gérer la profondeur
+        // par extension qui doit être afficher 
+        // si deux choses se trouvent à la même positon x et y.
+
+        // Par défaut, on mets z à la moitié de l'étage 
+        // comme ça z varie entre 0.0 et 24.0, la largeur du couloir.
+        // Il faudra changer redéfinir z à chaque changement d'étage.
+        transform.translation.z -= velocity.dy * time.delta_secs();
+
+        info!("z: {}", transform.translation.z);
     }
 }
 
