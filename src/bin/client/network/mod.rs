@@ -3,6 +3,7 @@ use aeronet_webtransport::client::{WebTransportClient, WebTransportClientPlugin}
 use bevy::prelude::*;
 use rand::random;
 use update::ClientNetworkSet;
+use std::env::var;
 
 mod config;
 mod observers;
@@ -49,10 +50,14 @@ impl Plugin for Client {
     }
 }
 
-const TARGET: &str = "https://[::1]:25565";
+const DEFAULT_TARGET: &str = "https://[::1]:25565";
 const CERT_HASH: &str = include_str!("../../../../.keys/hash");
 
 fn connect(mut commands: Commands) {
+    let target = match var("TARGET_URL") {
+        Ok(t) => t,
+        _ => DEFAULT_TARGET.to_string()
+    };
     let config = match config::client_config(CERT_HASH.to_string()) {
         Ok(config) => config,
         Err(err) => {
@@ -61,8 +66,8 @@ fn connect(mut commands: Commands) {
         }
     };
 
-    let name = format!("{}. {TARGET}", random::<u8>());
+    let name = format!("{}. {target}", random::<u8>());
     commands
         .spawn(Name::new(name))
-        .queue(WebTransportClient::connect(config, TARGET));
+        .queue(WebTransportClient::connect(config, target));
 }

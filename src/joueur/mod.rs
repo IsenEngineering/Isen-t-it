@@ -1,6 +1,5 @@
 use bevy::prelude::*;
-use composants::{Joueur, JoueurPrincipal, Velocity};
-use rand::random;
+use composants::Joueur;
 
 pub mod animation;
 mod mouvements;
@@ -75,29 +74,4 @@ pub fn spawn_player(
         },
         Joueur,
     )).id()
-}
-
-/* Systèmes */
-
-fn setup(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
-) {
-
-    let joueur_principal = spawn_player(
-        &mut commands, 
-        &asset_server, 
-        &mut texture_atlas_layouts, 
-        random::<u8>(), 
-        Vec3::new(24., 24., 2.)
-    );
-
-    commands.entity(joueur_principal).insert((
-        JoueurPrincipal,
-        Velocity::default(),
-        animation::AnimationTimer(
-            Timer::from_seconds(0.1, TimerMode::Repeating)
-        )
-    ));
 }

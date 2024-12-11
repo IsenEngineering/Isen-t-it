@@ -1,8 +1,12 @@
 use super::FrameTimeDiagnosticsPlugin;
+use aeronet::io::Session;
 use bevy::{diagnostic::DiagnosticsStore, prelude::*};
 
 #[derive(Component)]
 pub struct DebugFrame;
+
+#[derive(Component)]
+pub struct ConnectionStateFrame;
 
 pub fn update(mut text: Query<&mut Text, With<DebugFrame>>, diagnostics: Res<DiagnosticsStore>) {
     let fps = match diagnostics.get(&FrameTimeDiagnosticsPlugin::FPS) {
@@ -34,6 +38,16 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             ..default()
         })
         .with_children(|parent| {
+            parent.spawn((
+                Text("Hors ligne".to_string()),
+                TextColor(Color::linear_rgb(0.2, 0.1, 0.1)),
+                TextFont {
+                    font: font.clone(),
+                    font_size: 12.0,
+                    ..default()
+                },
+                ConnectionStateFrame
+            ));
             let text = format!("Isen't It - {}", VERSION);
             parent.spawn((
                 Text(text),
@@ -55,4 +69,24 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                 DebugFrame,
             ));
         });
+}
+
+pub fn connected(
+    _: Trigger<OnAdd, Session>,
+    mut texts: Query<(&mut Text, &mut TextColor), With<ConnectionStateFrame>>
+) {
+    for (mut text, mut color) in texts.iter_mut() {
+        text.0 = "En ligne".to_string();
+        color.0 = Color::linear_rgb(0.1, 0.2, 0.1);
+    }
+}
+
+pub fn disconnected(
+    _: Trigger<OnRemove, Session>,
+    mut texts: Query<(&mut Text, &mut TextColor), With<ConnectionStateFrame>>
+) {
+    for (mut text, mut color) in texts.iter_mut() {
+        text.0 = "Hors ligne".to_string();
+        color.0 = Color::linear_rgb(0.2, 0.1, 0.1);
+    }
 }

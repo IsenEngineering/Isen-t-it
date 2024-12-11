@@ -1,11 +1,11 @@
 [package]
 name = "isent_it"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 
 [dependencies]
 dotenv = "0.15.0"
-bevy = { version = "0.15.0", features = ["dynamic_linking"] }
+bevy = { version = "0.15.0" }
 aeronet = "0.11.0"
 aeronet_webtransport = { version = "0.11.0", features = ["client", "server"] }
 rand = "0.8.5"

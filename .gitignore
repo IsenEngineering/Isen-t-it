@@ -6,3 +6,4 @@ web/js
 web/assets
 .env
 .keys
+.vscode/settings.json

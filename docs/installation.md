@@ -49,8 +49,6 @@ et `wasm-bindgen --out-dir ./web/js --target web ./target/wasm32-unknown-unknown
 *Suppresion des binaires (les fichiers qui peuvent prendre beaucoup de stockage)*
 `cargo clean` *(cela supprime le dossier target du projet)*
 
-
-
 ## Proposition de modifications
 
 Désormais, vous pouvez modifier le code à votre guise locallement.

@@ -25,6 +25,10 @@ impl Plugin for PluginPerf {
         // si l'utilisateur est en mode debug.
         app.add_systems(Startup, information::setup);
         app.add_systems(Update, information::update);
+
+        app
+            .add_observer(information::connected)
+            .add_observer(information::disconnected);
         if debug == "true" {
             app.add_plugins(FrameTimeDiagnosticsPlugin);
             // Le plugin bevy_pls_editor n'est pas compatible avec la 0.15 de bevy

@@ -22,6 +22,8 @@
     </canvas>
     <script type="module">
         import init from './js/client.js';
+
+        console.warn("WebTransport available: ", 'WebTransport' in window)
         init();
     </script>
 </body>
