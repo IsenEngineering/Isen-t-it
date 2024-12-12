@@ -1,4 +1,4 @@
-FROM rust:alpine AS rs
+FROM rust:latest AS rs
 WORKDIR /app
 
 COPY . .
@@ -9,7 +9,7 @@ RUN cargo build --release --bin client --target wasm32-unknown-unknown
 RUN cargo install wasm-opt && wasm-opt -Os -o ./client.wasm ./target/wasm32-unknown-unknown/release/client.wasm
 RUN wasm-bindgen --out-dir ./out --target web ./client.wasm
 
-FROM rust:alpine AS rss
+FROM rust:latest AS rss
 WORKDIR /app
 
 RUN git clone https://github.com/Loshido/rust_static_server /app

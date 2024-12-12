@@ -82,10 +82,7 @@ pub fn animate_players(
 
         // On vérifie si l'entité est en mouvement.
         let is_moving = player.vitesse > 0.0;
-        if is_moving {
-            info!("{} m/s", player.vitesse);
-        }
-        let is_sprinting = player.vitesse >= PLAYER_SPRINT_SPEED * 0.7;
+        let is_sprinting = player.vitesse >= PLAYER_SPRINT_SPEED * 0.75;
 
         if player.vitesse > 0.0 {
             player.vitesse *= time.delta_secs();
@@ -115,9 +112,5 @@ pub fn animate_players(
             // L'image par défaut.
             texture.index = 0;
         }
-
-        // if player.vitesse > 0.0 {
-        //     player.vitesse *= 4.0 * time.delta_secs();
-        // }
     }
 }

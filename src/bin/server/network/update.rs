@@ -81,18 +81,20 @@ pub fn recv(
         // S'il y a eu des modifications, 
         // On les effectue, un autre système détectera les changements 
         // et enverra les modifications aux autres clients.
-        if updates.len() > 0 {
-            match player {
-                Some(mut p) => {
+        match player {
+            Some(mut p) => {
+                if updates.len() > 0 {
                     let last_update = updates.last().unwrap();
                     p.update(
                         *last_update, 
                         time.elapsed_secs()
                     );
-                },
-                None => {
-                    continue;
+                } else if p.vitesse != 0.0 {
+                    p.vitesse = 0.0;
                 }
+            },
+            None => {
+                continue;
             }
         }
     }
