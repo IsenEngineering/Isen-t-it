@@ -82,7 +82,10 @@ fn connect(mut commands: Commands) {
 // de l'indisponibilité de l'API WebTransport)
 
 // On switch sur du WebSocket (très largement supporté)
-const DEFAULT_TARGET_SOCKET: &str = "https://isent_it.aruni.space:25566";
+#[cfg(not(target_family = "wasm"))]
+const DEFAULT_TARGET_SOCKET: &str = "wss://isent_it.aruni.space:25566";
+#[cfg(target_family = "wasm")]
+const DEFAULT_TARGET_SOCKET: &str = "ws://isent_it.aruni.space:25566";
 fn websocket_fallback(
     trigger: Trigger<Disconnected>,
     mut commands: Commands,
@@ -91,7 +94,12 @@ fn websocket_fallback(
     let Disconnected { reason } = trigger.event();
     match reason {
         DisconnectReason::Error(_) => {
+            if webtransports.is_empty() {
+                return
+            }
+            
             info!("Switching on Websocket connections");
+            
             for webtransport in webtransports.iter() {
                 commands.entity(webtransport).try_despawn();
             }

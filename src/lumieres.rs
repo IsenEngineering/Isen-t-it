@@ -1,4 +1,5 @@
 use bevy::{core_pipeline::bloom::Bloom, prelude::*};
+#[cfg(not(target_family = "wasm"))]
 use bevy_light_2d::{light::{AmbientLight2d, PointLight2d}, plugin::Light2dPlugin};
 
 pub struct PluginLumieres;

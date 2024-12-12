@@ -42,7 +42,7 @@ pub fn identity() -> Identity {
     )
 }
 
-pub fn config(identity: Identity) -> ServerConfig {
+pub fn config(_identity: Identity) -> ServerConfig {
     use std::net::SocketAddr;
     let port = match var("PORT") {
         Ok(s) => s.parse::<u16>().unwrap_or(DEFAULT_PORT),
@@ -63,5 +63,6 @@ pub fn config(identity: Identity) -> ServerConfig {
                 )
             )
         )
-        .with_identity(identity)
+        .with_no_encryption()
+        // .with_identity(identity)
 }
