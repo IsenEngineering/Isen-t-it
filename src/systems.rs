@@ -16,8 +16,6 @@ pub fn movement_system(
 ) {
     // On parcourt toutes entités ayant le composant Transform & Velocity
     for (mut transform, velocity) in query.iter_mut() {
-        // Le vecteur de translation de l'entité
-        let translation: &mut Vec3 = &mut transform.translation;
 
         // Logique de la vérification des zones de collisions
         let mut outside = false;
@@ -27,15 +25,15 @@ pub fn movement_system(
             // l'entitée n'est pas hors de la zone jouable
             if !point_in_area(
                 Vec2::from([
-                    translation.x + velocity.dx * time.delta_secs(),
-                    translation.y + velocity.dy * time.delta_secs(),
+                    transform.translation.x + velocity.dx * time.delta_secs(),
+                    transform.translation.y + velocity.dy * time.delta_secs(),
                 ]),
                 area,
             ) {
                 outside = true
             }
         }
-        if outside {
+        if outside || (velocity.dx.abs() < 0.1 && velocity.dy.abs() < 0.1) {
             // Si l'entité est hors de la zone
             // On n'applique pas la velocite,
             // On passe à l'entité suivante
@@ -48,8 +46,17 @@ pub fn movement_system(
         utiliser * time.delta_seconds() assure que le mouvement
         ne diffère pas d'un appareil performant (beaucoup d'images
         par seconde) à un appareil moins performant */
-        translation.x += velocity.dx * time.delta_secs();
-        translation.y += velocity.dy * time.delta_secs();
+        transform.translation.x += velocity.dx * time.delta_secs();
+        transform.translation.y += velocity.dy * time.delta_secs();
+
+        // La troisième dimension permet de gérer la profondeur
+        // par extension qui doit être afficher 
+        // si deux choses se trouvent à la même positon x et y.
+
+        // Par défaut, on mets z à la moitié de l'étage 
+        // comme ça z varie entre 0.0 et 24.0, la largeur du couloir.
+        // Il faudra changer redéfinir z à chaque changement d'étage.
+        transform.translation.z -= velocity.dy * time.delta_secs();
     }
 }
 

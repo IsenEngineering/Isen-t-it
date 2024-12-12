@@ -3,9 +3,11 @@ WORKDIR /app
 
 COPY . .
 
-RUN rustup target add wasm32-unknown-unknown && cargo install -f wasm-bindgen-cli
+RUN rustup target add wasm32-unknown-unknown && cargo install -f wasm-bindgen-cli --version 0.2.97
 
-RUN cargo build --release --target wasm32-unknown-unknown && wasm-bindgen --out-dir ./out --target web ./target/wasm32-unknown-unknown/release/isent_it.wasm
+RUN cargo build --release --bin client --target wasm32-unknown-unknown
+RUN cargo install wasm-opt && wasm-opt -Os -o ./client.wasm ./target/wasm32-unknown-unknown/release/client.wasm
+RUN wasm-bindgen --out-dir ./out --target web ./client.wasm
 
 FROM rust:latest AS rss
 WORKDIR /app

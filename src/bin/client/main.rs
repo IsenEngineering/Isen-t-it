@@ -1,11 +1,15 @@
 use bevy::{color::palettes::css::BLACK, prelude::*};
 
-mod collisions;
-mod debug;
-mod joueur;
-mod lumieres;
-mod monde;
-mod systems;
+use isent_it::{
+    collisions,
+    debug,
+    joueur,
+    lumieres,
+    monde,
+    systems
+};
+
+mod network;
 
 fn main() {
     // Application Bevy
@@ -31,11 +35,12 @@ fn main() {
                 }),
                 ..default()
             }),
-        joueur::Joueur,
+        joueur::PluginJoueur,
         monde::Monde,
         debug::PluginPerf,
         collisions::PluginCollisions,
         lumieres::PluginLumieres,
+        network::Client,
     ));
 
     // Au démarrage

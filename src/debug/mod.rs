@@ -1,4 +1,5 @@
 use bevy::{diagnostic::FrameTimeDiagnosticsPlugin, prelude::*};
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
 // use bevy_editor_pls::EditorPlugin;
 use dotenv::dotenv;
 
@@ -25,8 +26,15 @@ impl Plugin for PluginPerf {
         // si l'utilisateur est en mode debug.
         app.add_systems(Startup, information::setup);
         app.add_systems(Update, information::update);
+
+        app
+            .add_observer(information::connected)
+            .add_observer(information::disconnected);
         if debug == "true" {
-            app.add_plugins(FrameTimeDiagnosticsPlugin);
+            app.add_plugins((
+                FrameTimeDiagnosticsPlugin,
+                WorldInspectorPlugin::default()
+            ));
             // Le plugin bevy_pls_editor n'est pas compatible avec la 0.15 de bevy
             // EditorPlugin::new() 
         }
