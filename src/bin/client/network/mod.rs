@@ -1,4 +1,5 @@
-use aeronet::transport::{AeronetTransportPlugin, TransportSet};
+use aeronet::{io::connection::{DisconnectReason, Disconnected}, transport::{AeronetTransportPlugin, TransportSet}};
+use aeronet_websocket::client::{WebSocketClient, WebSocketClientPlugin};
 use aeronet_webtransport::client::{WebTransportClient, WebTransportClientPlugin};
 use bevy::prelude::*;
 use rand::random;
@@ -15,6 +16,7 @@ impl Plugin for Client {
     fn build(&self, app: &mut App) {
         app.add_plugins((
             WebTransportClientPlugin,
+            WebSocketClientPlugin,
             AeronetTransportPlugin
         ));
 
@@ -46,7 +48,8 @@ impl Plugin for Client {
         app
             .add_observer(observers::on_connected)
             .add_observer(observers::on_connecting)
-            .add_observer(observers::on_disconnected);
+            .add_observer(observers::on_disconnected)
+            .add_observer(websocket_fallback);
     }
 }
 
@@ -59,7 +62,7 @@ fn connect(mut commands: Commands) {
         Ok(t) => t,
         _ => DEFAULT_TARGET.to_string()
     };
-    let config = match config::client_config(CERT_HASH.to_string()) {
+    let config = match config::transport::config(CERT_HASH.to_string()) {
         Ok(config) => config,
         Err(err) => {
             warn!("Failed to create client config: {err:#}");
@@ -71,4 +74,39 @@ fn connect(mut commands: Commands) {
     commands
         .spawn(Name::new(name))
         .queue(WebTransportClient::connect(config, target));
+}
+
+
+// Lorsqu'on détecte une déconnexion due à une erreur 
+// (il y a de très très grandes chances que ça vient 
+// de l'indisponibilité de l'API WebTransport)
+
+// On switch sur du WebSocket (très largement supporté)
+const DEFAULT_TARGET_SOCKET: &str = "https://isent_it.aruni.space:25566";
+fn websocket_fallback(
+    trigger: Trigger<Disconnected>,
+    mut commands: Commands,
+    webtransports: Query<Entity, With<WebTransportClient>>
+) {
+    let Disconnected { reason } = trigger.event();
+    match reason {
+        DisconnectReason::Error(_) => {
+            info!("Switching on Websocket connections");
+            for webtransport in webtransports.iter() {
+                commands.entity(webtransport).try_despawn();
+            }
+            let target = match var("TARGET_URL_SOCKET") {
+                Ok(t) => t,
+                _ => DEFAULT_TARGET_SOCKET.to_string()
+            };
+
+            let config = config::socket::config();
+
+            let name = format!("{}. {target}", random::<u8>());
+            commands
+                .spawn(Name::new(name))
+                .queue(WebSocketClient::connect(config, target));
+        },
+        _ => return
+    }
 }

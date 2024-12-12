@@ -5,7 +5,7 @@ use aeronet_webtransport::{
 use aeronet::io::anyhow;
 
 #[cfg(target_family = "wasm")]
-pub fn client_config(cert_hash: String) -> Result<ClientConfig, anyhow::Error> {
+pub fn config(cert_hash: String) -> Result<ClientConfig, anyhow::Error> {
     use aeronet_webtransport::xwt_web_sys::{CertificateHash, HashAlgorithm};
 
     let server_certificate_hashes = match cert::hash_from_b64(&cert_hash) {
@@ -26,7 +26,7 @@ pub fn client_config(cert_hash: String) -> Result<ClientConfig, anyhow::Error> {
 }
 
 #[cfg(not(target_family = "wasm"))]
-pub fn client_config(cert_hash: String) -> Result<ClientConfig, anyhow::Error> {
+pub fn config(cert_hash: String) -> Result<ClientConfig, anyhow::Error> {
     use bevy::utils::Duration;
     use aeronet_webtransport::wtransport::tls::Sha256Digest;
 

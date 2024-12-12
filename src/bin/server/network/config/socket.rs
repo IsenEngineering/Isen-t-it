@@ -1,6 +1,6 @@
-use aeronet_webtransport::wtransport::{tls::{Certificate, CertificateChain, PrivateKey}, Identity, ServerConfig};
-use bevy::utils::Duration;
-use std::env::var;
+use aeronet_websocket::server::{Identity, ServerConfig};
+use std::{env::var, net::{Ipv4Addr, SocketAddrV4}};
+use super::DEFAULT_PORT;
 
 #[cfg(not(feature = "custom-certificate"))]
 pub fn identity() -> Identity {
@@ -12,9 +12,11 @@ pub fn identity() -> Identity {
         ]
     ).expect("all given SANs should be valid DNS names")
 } 
+
 #[cfg(feature = "custom-certificate")]
 pub fn identity() -> Identity {
     use std::fs::read;
+    use aeronet_websocket::rustls::pki_types::{CertificateDer, PrivateKeyDer, PrivatePkcs8KeyDer};
 
     let key_file = read(".keys/key.pem")
         .expect("Il n'y a pas la clé privée .keys/key.pem");
@@ -28,30 +30,38 @@ pub fn identity() -> Identity {
         .expect(".keys/cert.pem n'est pas un fichier pem");
     let cert_der = cert_pem.contents().to_vec();
 
-    let certificat = Certificate::from_der(cert_der)
-        .expect("Le certificat n'est pas valide!");
+    let private_key = PrivateKeyDer::Pkcs8(
+        PrivatePkcs8KeyDer::from(key_der)
+    );
 
-    let private_key = PrivateKey::from_der_pkcs8(key_der);
+    let certificate = CertificateDer::from(cert_der);
 
     Identity::new(
-        CertificateChain::single(certificat), 
+        vec![certificate],
         private_key
     )
-} 
+}
 
-const DEFAULT_PORT: u16 = 25565;
-pub fn server_config(identity: &Identity) -> ServerConfig {
-    use aeronet_webtransport::wtransport::config::IpBindConfig::InAddrAnyV4;
+pub fn config(identity: Identity) -> ServerConfig {
+    use std::net::SocketAddr;
     let port = match var("PORT") {
         Ok(s) => s.parse::<u16>().unwrap_or(DEFAULT_PORT),
         _ => DEFAULT_PORT
     };
 
     ServerConfig::builder()
-        .with_bind_config(InAddrAnyV4, port)
+        .with_bind_address(
+            SocketAddr::V4(
+                SocketAddrV4::new(
+                    Ipv4Addr::new(
+                        0, 
+                        0, 
+                        0, 
+                        0
+                    ), 
+                    port + 1
+                )
+            )
+        )
         .with_identity(identity)
-        .keep_alive_interval(Some(Duration::from_secs(1)))
-        .max_idle_timeout(Some(Duration::from_secs(5)))
-        .expect("should be a valid idle timeout")
-        .build()
 }
