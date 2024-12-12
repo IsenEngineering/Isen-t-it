@@ -57,8 +57,6 @@ pub fn movement_system(
         // comme ça z varie entre 0.0 et 24.0, la largeur du couloir.
         // Il faudra changer redéfinir z à chaque changement d'étage.
         transform.translation.z -= velocity.dy * time.delta_secs();
-
-        info!("z: {}", transform.translation.z);
     }
 }
 

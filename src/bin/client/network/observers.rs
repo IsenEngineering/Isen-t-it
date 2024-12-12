@@ -14,7 +14,7 @@ pub fn on_connecting(
     info!("{name} connecting");
 }
 
-use isent_it::{joueur::{composants::{JoueurPrincipal, Velocity}, spawn_player, animation::AnimationTimer}, network::{Player, TRANSPORT_LANES}};
+use isent_it::{joueur::{composants::{JoueurPrincipal, Velocity}, spawn_player}, network::{Player, TRANSPORT_LANES}};
 use rand::random;
 
 // Lorsqu'il parvient à se connecter
@@ -45,26 +45,22 @@ pub fn on_connected(
     ).unwrap();
 
     // Les données partagés avec le serveur
-    let player = Player {
-        position: Vec3::new(24., 24., 15.),
-        skin: random::<u8>()
-    };
+    let player = Player::new(
+        Vec3::new(24., 24., 15.), 
+        random::<u8>()
+    );
 
     // L'instance du joueur côté client
     let joueur_principal = spawn_player(
         &mut commands, 
         &asset_server, 
         &mut texture_atlas_layouts, 
-        player.skin, 
-        player.position
+        player.clone()
     );
 
     commands.entity(joueur_principal).insert((
         JoueurPrincipal,
-        Velocity::default(),
-        AnimationTimer(
-            Timer::from_seconds(0.1, TimerMode::Repeating)
-        )
+        Velocity::default()
     ));
 
     // On se présente au serveur

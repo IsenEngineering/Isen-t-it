@@ -1,9 +1,9 @@
 use aeronet::transport::lane::LaneIndex;
 use aeronet::transport::Transport;
 use bevy::{prelude::*, utils::Instant};
-use isent_it::joueur::composants::{Joueur, JoueurPrincipal};
+use isent_it::joueur::composants::JoueurPrincipal;
 use isent_it::joueur::spawn_player;
-use isent_it::network::{ClientDeconnection, ClientToServer, ClientsConnection, ServerToClient};
+use isent_it::network::{ClientDeconnection, ClientToServer, ClientsConnection, Player, ServerToClient};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, SystemSet)]
 pub enum ClientNetworkSet {
@@ -37,7 +37,8 @@ pub fn send(
 // Récéption des messages du serveur
 pub fn recv(
     mut commands: Commands,
-    mut players: Query<(&mut Transform, &Name, Entity), With<Joueur>>,
+    mut players: Query<(&mut Transform, &mut Player, &Name, Entity)>,
+    time: Res<Time>,
     mut transports: Query<&mut Transport>,
     asset_server: Res<AssetServer>,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
@@ -58,15 +59,14 @@ pub fn recv(
 
                     // On instancie les joueurs
                     for (name, player) in connections.iter() {
-                        let player = spawn_player(
+                        let entity = spawn_player(
                             &mut commands, 
                             &asset_server, 
                             &mut texture_atlas_layouts, 
-                            player.skin, 
-                            player.position,
+                            player.clone()
                         );
         
-                        commands.entity(player).insert(Name::new(name.to_string()));
+                        commands.entity(entity).insert(Name::new(name.to_string()));
                     }
                 },
                 // Lorsque des autres joueurs se déplacent
@@ -79,15 +79,19 @@ pub fn recv(
                         }
                     };
 
-                    'players_position: for (mut player, name, _) in players.iter_mut() {
+                    'players_position: for (mut transform, mut player, name, _) in players.iter_mut() {
                         // Si l'utilisateur est dans le tableau des modifications
                         // On modifie sa position
                         if !positions.contains_key(name.as_str()) {
+
+                            player.vitesse = 0.0;
                             continue 'players_position;
                         }
         
                         let position = positions.remove(name.as_str()).unwrap();
-                        player.translation = position;
+                        
+                        player.update(position, time.elapsed_secs());
+                        transform.translation = position;
                     }
                 },
                 // Lorsque d'autres joueurs se deconnectent 
@@ -101,7 +105,7 @@ pub fn recv(
                     };
 
                     // On supprime les joueurs en question
-                    for (_, name, entity) in players.iter_mut() {
+                    for (_, _, name, entity) in players.iter_mut() {
                         if player.eq(name.as_str()) {
                             commands.entity(entity).despawn();
                         }

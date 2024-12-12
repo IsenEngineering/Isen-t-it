@@ -3,9 +3,6 @@ use bevy::prelude::*;
 #[derive(Component)]
 pub struct JoueurPrincipal;
 
-#[derive(Component)]
-pub struct Joueur;
-
 // Velocité d'une entité
 #[derive(Component)]
 pub struct Velocity {

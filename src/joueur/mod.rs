@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use composants::Joueur;
+use crate::network::Player;
 
 pub mod animation;
 mod mouvements;
@@ -25,11 +25,17 @@ impl Plugin for PluginJoueur {
 
         // à chaque image
         app.add_systems(
-            Update,
+            PreUpdate, 
             (
-                mouvements::move_sprite,
-                mouvements::move_sprite_touches.after(mouvements::move_sprite),
-                animation::animate_sprite,
+            mouvements::move_sprite,
+            mouvements::move_sprite_touches,
+            ).chain()
+        );
+        app.add_systems(
+            PostUpdate,
+            (
+                animation::animate_local_sprite,
+                animation::animate_players
             ),
         );
     }
@@ -39,11 +45,10 @@ pub fn spawn_player(
     commands: &mut Commands, 
     asset_server: &Res<AssetServer>,
     texture_atlas_layouts: &mut ResMut<Assets<TextureAtlasLayout>>,
-    skin: u8,
-    position: Vec3
+    player: Player
 ) -> Entity {
     // Les animations du personnage
-    let texture = match skin % 4 {
+    let texture = match player.skin % 4 {
         0 => asset_server.load(PLAYER_SPRITESHEET),
         1 => asset_server.load(PLAYER_SPRITESHEET_DOUX),
         2 => asset_server.load(PLAYER_SPRITESHEET_TARD),
@@ -68,10 +73,13 @@ pub fn spawn_player(
             ..default()
         },
         Transform {
-            translation: position,
+            translation: player.position,
             scale: Vec3::new(1., 1., 1.),
             ..default()
         },
-        Joueur,
+        animation::AnimationTimer(
+            Timer::from_seconds(0.1, TimerMode::Repeating)
+        ),
+        player
     )).id()
 }

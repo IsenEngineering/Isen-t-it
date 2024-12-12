@@ -12,6 +12,7 @@ pub enum ServerNetworkSet {
 // Gères les messages entrants
 pub fn recv(
     mut commands: Commands,
+    time: Res<Time>,
 
     // Tous les joueurs connectés
     mut clients: Query<(&mut Transport, Entity, Option<&mut Player>)>,
@@ -84,7 +85,10 @@ pub fn recv(
             match player {
                 Some(mut p) => {
                     let last_update = updates.last().unwrap();
-                    p.position = *last_update;
+                    p.update(
+                        *last_update, 
+                        time.elapsed_secs()
+                    );
                 },
                 None => {
                     continue;
