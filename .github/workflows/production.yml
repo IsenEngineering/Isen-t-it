@@ -2,11 +2,9 @@ name: Build and Push Isen't it to Docker Hub
 
 on:
   push:
-    branches:
-      - production
-  pull-request:
-    branches:
-      - production
+    branches: [ "production" ]
+  pull_request:
+    branches: [ "production" ]
 
 jobs:
   build:
