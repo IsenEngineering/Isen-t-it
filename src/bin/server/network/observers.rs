@@ -56,6 +56,7 @@ pub fn on_connected(
     for (player, entity) in players.iter() {
         // L'identifiant des joueurs connectés 
         let name = entity.to_bits().to_string();
+        
         connected.insert(
             name, 
             player.clone()

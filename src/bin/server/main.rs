@@ -1,6 +1,10 @@
 use std::time::Duration;
 
-use bevy::{app::ScheduleRunnerPlugin, log::LogPlugin, prelude::*};
+use bevy::{
+    app::ScheduleRunnerPlugin, 
+    log::LogPlugin, 
+    prelude::*, remote::{http::RemoteHttpPlugin, RemotePlugin}
+};
 
 mod network;
 const TICK_RATE: f64 = 30.0;
@@ -15,7 +19,9 @@ fn main() {
         ))),
         LogPlugin::default(),
         network::Reseau,
-        TransformPlugin
+        TransformPlugin,
+        RemotePlugin::default(),
+        RemoteHttpPlugin::default()
     ));
     app.run();
 }

@@ -69,9 +69,12 @@ fn listen(mut commands: Commands) {
     write(".keys/hash", cert_hash).unwrap();
 
     let transport_config = config::transport::config(&transport_identity);
-    commands.spawn_empty().queue(WebTransportServer::open(transport_config)); 
+
+    commands.spawn_empty()
+    .queue(WebTransportServer::open(transport_config));
 
     // Websocket listen to the given port + 1 or default port + 1
     let socket_config = config::socket::config(socket_identity);
-    commands.spawn_empty().queue(WebSocketServer::open(socket_config)); 
+    commands.spawn_empty()
+        .queue(WebSocketServer::open(socket_config));
 }
