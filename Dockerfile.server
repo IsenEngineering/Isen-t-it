@@ -1,33 +1,16 @@
-# 144.24.195.75
-FROM rust:alpine AS rs
+FROM rust:latest AS rs
 WORKDIR /bevy
 
 COPY . .
 
-RUN apk add build-base pkgconfig alsa-lib alsa-lib-dev eudev-dev musl-dev musl
+ENV TARGET_CC=/usr/bin/clang
+RUN cargo build --release --bin server
 
-ENV PKG_CONFIG_PATH="/usr/lib/pkgconfig:/usr/share/pkgconfig"
-# ENV RUSTFLAGS="-C target-feature=+crt-static"
-# ENV LD_LIBRARY_PATH="/usr/lib:$LD_LIBRARY_PATH"
-ENV RUSTFLAGS="-C target-feature=+crt-static -L/usr/lib"
-
-# ENV RUSTFLAGS="-C linker=cc -L/usr/lib -lasound"
-
-# ENV RUSTFLAGS="-C linker=cc -L/usr/lib -lasound"
-# ENV CC_aarch64_unknown_linux_musl="aarch64-linux-musl-gcc"
-# ENV AR_aarch64_unknown_linux_musl=aarch64-linux-musl-ar
-
-# ENV CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_RUSTFLAGS="-Clink-self-contained=yes -Clinker=rust-lld"
-# ENV CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER=aarch64-linux-gnu-gcc
-ENV CC=aarch64-linux-gnu-gcc
-
-RUN rustup target add aarch64-unknown-linux-musl
-RUN cargo build --release --target aarch64-unknown-linux-musl --bin server --verbose
-
-FROM alpine:latest AS prod
+FROM debian:trixie-slim AS prod
 WORKDIR /app
 
-COPY --from=rs /bevy/target/aarch64-unknown-linux-musl/release/server /bin/server
+COPY --from=rs /bevy/target/release/server /app/server
 
+ENV PORT=25565
 EXPOSE 25565
-CMD [ "/bin/server" ]
+CMD [ "/app/server" ]

@@ -3,6 +3,7 @@ WORKDIR /app
 
 RUN git clone https://github.com/Loshido/rust_static_server /app
 RUN rustup target add aarch64-unknown-linux-musl
+ENV TARGET_CC=/usr/bin/clang
 RUN cargo build --release --target aarch64-unknown-linux-musl
 
 FROM alpine:latest AS prod
