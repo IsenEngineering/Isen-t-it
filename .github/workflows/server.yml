@@ -23,9 +23,15 @@ jobs:
         target: aarch64-unknown-linux-musl
         override: true
 
-    - name: Build Rust app for wasm32 target
-      run: |
-        cargo build --release --target aarch64-unknown-linux-musl --bin server
+    - name: Cache
+      uses: Swatinem/rust-cache@v2
+
+    - name: Build arm64 for alpine
+      uses: actions-rs/cargo@v1
+      with:
+        use-cross: true
+        command: build
+        args: --release --target=aarch64-unknown-linux-musl --bin server
 
     - name: Prepare binaries
       run: |
