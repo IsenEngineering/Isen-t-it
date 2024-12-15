@@ -1,16 +1,8 @@
-FROM rust:latest AS rs
-WORKDIR /bevy
-
-COPY . .
-
-ENV TARGET_CC=/usr/bin/clang
-RUN cargo build --release --bin server
-
-FROM debian:trixie-slim AS prod
+FROM alpine:latest AS prod
 WORKDIR /app
 
-COPY --from=rs /bevy/target/release/server /app/server
+COPY /app/listen /app/listen
 
 ENV PORT=25565
 EXPOSE 25565
-CMD [ "/app/server" ]
+CMD [ "/app/listen" ]
