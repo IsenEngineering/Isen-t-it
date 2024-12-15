@@ -5,5 +5,5 @@
 web/js
 web/assets
 .env
-.keys/*.pem
+.keys/*.*
 .vscode/settings.json

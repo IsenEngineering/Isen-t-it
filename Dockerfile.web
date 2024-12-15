@@ -1,9 +1,9 @@
 FROM loshido/rust-webserver:latest
 WORKDIR /app
 
-COPY assets /app/
+COPY assets /app/assets
 COPY web /app/
-COPY actions/js /app/
+COPY actions/js /app/js
 
 ENV ROCKET_ADDRESS="0.0.0.0"
 ENV ROCKET_PORT="80"
