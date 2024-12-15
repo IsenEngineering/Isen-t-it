@@ -24,8 +24,8 @@ jobs:
         override: true
 
     - name: Install Bevy's dependencies
-      run: apt-get update && \
-        apt-get install g++ pkg-config libx11-dev libasound2-dev libudev-dev libxkbcommon-x11-0
+      run: sudo apt-get update && \
+        sudo apt-get install g++ pkg-config libx11-dev libasound2-dev libudev-dev libxkbcommon-x11-0 -y
 
     - name: Cache
       uses: Swatinem/rust-cache@v2
