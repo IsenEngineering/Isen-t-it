@@ -54,4 +54,5 @@ jobs:
         context: .
         file: ./Dockerfile.web
         push: true
+        platforms: linux/amd64, linux/arm64, linux/arm64/v8
         tags: ${{ secrets.DOCKER_USERNAME }}/isent_it:latest
